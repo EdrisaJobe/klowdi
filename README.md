@@ -1,6 +1,6 @@
 # Klowdi.com - Interactive Weather Experience
 
-![Klowdi.com Screenshot](https://ibb.co/ChNp3wX)
+![Klowdi.com Screenshot](https://i.ibb.co/kQkVsGr/files-2083263-1735252761431-image.png)
 
 Klowdi.com is a sophisticated weather visualization platform that combines real-time weather data with interactive mapping capabilities to provide an immersive weather experience.
 
