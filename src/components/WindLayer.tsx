@@ -13,35 +13,31 @@ interface WindLayerProps {
 }
 
 export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const animationRef = useRef<number | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>();
   const particlesRef = useRef<Array<{ x: number; y: number; speed: number; angle: number }>>([]);
-  const lastWindDataRef = useRef<typeof windData>(windData);
+  const lastWindDataRef = useRef(windData);
 
   useEffect(() => {
     if (!map) return;
     
-    // Create canvas if it doesn't exist
-    if (!canvasRef.current) {
-      const canvas = document.createElement('canvas');
-      canvas.className = "absolute inset-0 pointer-events-none z-20";
-      canvas.style.opacity = visible ? '0.7' : '0';
-      canvas.style.transition = 'opacity 0.3s ease-in-out';
-      map.getViewport().appendChild(canvas);
-      canvasRef.current = canvas;
-    }
+    const viewport = map.getViewport();
+    const canvas = document.createElement('canvas');
+    canvas.className = "absolute inset-0 pointer-events-none z-20";
+    canvas.style.opacity = visible ? '0.7' : '0';
+    canvas.style.transition = 'opacity 0.3s ease-in-out';
+    viewport.appendChild(canvas);
+    canvasRef.current = canvas;
     
     // Update last wind data reference
     if (windData) {
       lastWindDataRef.current = windData;
     }
 
-    const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d')!;
     let isAnimating = visible;
 
     function resizeCanvas() {
-      if (!map) return;
       const size = map.getSize();
       if (!size) return;
       canvas.width = size[0];
@@ -49,7 +45,6 @@ export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
     }
 
     async function initializeParticles() {
-      if (!map) return;
       const view = map.getView();
       const zoom = view.getZoom() || 4;
       const extent = view.calculateExtent();
@@ -65,14 +60,14 @@ export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
         return {
           x,
           y,
-          speed: (lastWindDataRef.current?.speed || 0) * 0.05,
-          angle: ((lastWindDataRef.current?.deg || 0) * Math.PI) / 180
+          speed: lastWindDataRef.current.speed * 0.05, // Even slower animation
+          angle: (lastWindDataRef.current.deg * Math.PI) / 180
         };
       });
     }
 
     function animate() {
-      if (!isAnimating || !map) return;
+      if (!isAnimating) return;
       
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const view = map.getView();
@@ -92,9 +87,10 @@ export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
 
         // Calculate arrow scale based on zoom level
         const scale = Math.min(1.2, Math.max(0.6, zoom / 10));
+        const alpha = Math.min(0.8, Math.max(0.3, zoom / 15));
 
-        // Draw wind arrow
-        drawWindArrows(ctx, particle.x, particle.y, particle.angle, particle.speed * 10, scale);
+        // Draw wind arrow (angle already points in wind direction)
+        drawWindArrows(ctx, particle.x, particle.y, particle.angle, particle.speed * 10, alpha, scale);
       });
 
       animationRef.current = requestAnimationFrame(animate);
@@ -139,21 +135,20 @@ export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
     return () => {
       map.un('postrender', postrender);
       map.un('moveend', moveEndListener);
+      
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
+        animationRef.current = undefined;
       }
+      
+      if (canvas && canvas.parentNode === viewport) {
+        canvas.parentNode.removeChild(canvas);
+      }
+      canvasRef.current = null;
     };
   }, [map, visible, center, windData]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (canvasRef.current?.parentNode) {
-        canvasRef.current.parentNode.removeChild(canvasRef.current);
-      }
-    };
-  }, []);
-
-  return null;
+  return (
+    null
+  );
 }

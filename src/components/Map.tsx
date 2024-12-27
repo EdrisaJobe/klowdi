@@ -5,8 +5,9 @@ import { defaults as defaultInteractions } from 'ol/interaction';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import { MapBrowserEvent } from 'ol';
+import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
+import { Style, Icon } from 'ol/style';
 import OSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 import { Overlay } from 'ol';
@@ -44,6 +45,7 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
   const [showPrecipitation, setShowPrecipitation] = useState(false);
   const [showPressure, setShowPressure] = useState(false);
   const [showGlobe, setShowGlobe] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -51,11 +53,12 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
     const markerSource = new VectorSource();
     const markerLayer = new VectorLayer({
       source: markerSource,
-      zIndex: 100,
+      zIndex: 100, // Ensure marker is always on top
     });
 
     markerLayerRef.current = markerLayer;
     
+    // Create overlay for coordinates popup
     overlayRef.current = new Overlay({
       element: popupRef.current!,
       positioning: 'bottom-center',
@@ -66,15 +69,23 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
     mapInstanceRef.current = new Map({
       target: mapRef.current,
       layers: [
-        new TileLayer({
+        new TileLayer({ // Base map layer
           zIndex: 0,
           source: new OSM({
             maxZoom: 19,
             crossOrigin: 'anonymous',
-            url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            imageSmoothing: false, // Disable image smoothing for better performance
+            // Use multiple subdomains for parallel requests
+            urls: [
+              'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            ]
           }),
+          // Optimize tile loading
           preload: 4,
-          useInterimTilesOnError: true
+          useInterimTilesOnError: true,
+          renderMode: 'image' // Use image rendering for better performance
         }),
         markerLayer,
       ],
@@ -84,9 +95,16 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         zoom: 4,
         enableRotation: false,
         maxZoom: 19,
-        minZoom: 2
+        minZoom: 2,
+        // Smooth animations
+        animation: true,
+        animationDuration: 250
       }),
+      // Performance settings
       pixelRatio: window.devicePixelRatio > 1 ? 2 : 1,
+      loadTilesWhileAnimating: true,
+      loadTilesWhileInteracting: true,
+      // Enable interactions
       interactions: defaultInteractions({
         mouseWheelZoom: true,
         doubleClickZoom: true,
@@ -95,14 +113,16 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
       })
     });
 
-    const handlePointerMove = (evt: MapBrowserEvent<UIEvent>) => {
+    // Add pointer cursor on marker hover
+    const handlePointerMove = (evt) => {
       const pixel = mapInstanceRef.current!.getEventPixel(evt.originalEvent);
       const hit = mapInstanceRef.current!.hasFeatureAtPixel(pixel);
       mapRef.current!.style.cursor = hit ? 'pointer' : '';
     };
     mapInstanceRef.current.on('pointermove', handlePointerMove);
 
-    const handleClick = (evt: MapBrowserEvent<UIEvent>) => {
+    // Add click handler for marker
+    const handleClick = (evt) => {
       const feature = mapInstanceRef.current!.forEachFeatureAtPixel(evt.pixel, (feature) => feature);
       
       if (feature) {
@@ -194,28 +214,35 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
       >
         Lat: {center[1].toFixed(6)}, Lon: {center[0].toFixed(6)}
       </div>
-      <div className="fixed left-4 top-4 z-20 flex gap-2">
+      <div className="hidden sm:flex fixed left-4 top-4 z-20 gap-2">
         <button
+          data-globe-button
           onClick={() => setShowGlobe(!showGlobe)}
-          className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border border-gray-100 
+          className="bg-white/90 backdrop-blur-sm p-2 sm:px-4 sm:py-2 rounded-lg shadow-lg border border-gray-100 
                    hover:bg-gray-50 transition-colors flex items-center gap-2"
         >
           <Globe className={`w-6 h-6 ${showGlobe ? 'text-blue-500' : 'text-gray-600'}`} />
-          <span className="text-sm font-medium">3D View</span>
+          <span className="hidden sm:inline text-sm font-medium">3D View</span>
         </button>
         <button
+          data-location-button
           onClick={() => {
+            setIsLocating(true);
             if (onLocationSelect) {
               getUserLocation()
-                .then(loc => onLocationSelect(loc.latitude, loc.longitude))
+                .then(loc => {
+                  onLocationSelect(loc.latitude, loc.longitude);
+                  setTimeout(() => setIsLocating(false), 1000);
+                })
                 .catch(error => {
                   console.error('Failed to get location:', error);
+                  setIsLocating(false);
                   // TODO: Show error toast/notification to user
                 });
             }
           }}
-          className="bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg border border-gray-100 
-                   hover:bg-gray-50 transition-colors"
+          className={`relative bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg border border-gray-100 
+                   hover:bg-gray-50 transition-colors ${isLocating ? 'location-button-active' : ''}`}
           title="My Location"
         >
           <MapPin className="w-6 h-6 text-gray-600" />

@@ -21,16 +21,18 @@ body {
 .ol-zoom {
   right: 0.5em;
   left: auto;
-  top: 1em;
+  top: 5em;
 }
 
 .ol-zoom button {
   background-color: rgba(255, 255, 255, 0.9) !important;
   color: #333 !important;
-  margin: 2px;
+  margin: 1px;
   transition: all 0.2s;
   font-weight: bold !important;
-  font-size: 1.2em !important;
+  font-size: 1em !important;
+  padding: 0.3em !important;
+  touch-action: manipulation;
 }
 
 .ol-zoom button:hover {
@@ -50,6 +52,42 @@ body {
   }
 }
 
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-dot {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}
+
+.location-button-active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: rgb(59 130 246 / 0.3);
+  animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.location-button-active {
+  animation: pulse-dot 1.25s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
 @media (prefers-color-scheme: dark) {
   .ol-zoom button {
     background-color: rgba(255, 255, 255, 0.9) !important;
@@ -59,5 +97,17 @@ body {
   .ol-zoom button:hover {
     background-color: rgba(255, 255, 255, 1) !important;
     color: #000 !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .ol-zoom {
+    top: 1em;
+  }
+  
+  .ol-zoom button {
+    margin: 2px;
+    font-size: 1.2em !important;
+    padding: 0.5em !important;
   }
 }

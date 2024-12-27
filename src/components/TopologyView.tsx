@@ -80,7 +80,7 @@ export function TopologyView({ center, width, height }: TopologyViewProps) {
   }, [center, width, height]);
 
   return (
-    <div className="absolute bottom-4 right-4 z-10 bg-white/90 backdrop-blur-sm rounded-lg 
+    <div className="hidden sm:block absolute bottom-4 right-4 z-10 bg-white/90 backdrop-blur-sm rounded-lg 
                   shadow-lg border border-gray-100 overflow-hidden w-80 transition-all 
                   duration-200 hover:shadow-xl">
       <div className="p-2 border-b border-gray-100 flex items-center gap-2 justify-center">

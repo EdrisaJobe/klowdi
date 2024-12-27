@@ -12,21 +12,40 @@ interface TemperatureLayerProps {
 export function TemperatureLayer({ map, center, visible }: TemperatureLayerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dataRef = useRef<{ temp: number; grid: number[][] } | null>(null);
+  const animationFrameRef = useRef<number>();
 
   useEffect(() => {
-    if (!map || !visible || !canvasRef.current) return;
+    if (!map || !visible) return;
 
-    const canvas = canvasRef.current;
+    const viewport = map.getViewport();
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = `
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    `;
+    viewport.appendChild(canvas);
+    canvasRef.current = canvas;
+    
     const ctx = canvas.getContext('2d', { alpha: true })!;
+    let isDestroyed = false;
 
     function resizeCanvas() {
       const size = map.getSize();
       if (!size) return;
       canvas.width = size[0];
       canvas.height = size[1];
+      if (dataRef.current) {
+        drawHeatmap();
+      }
     }
 
     async function updateTemperatureData() {
+      if (isDestroyed) return;
+      
       const data = await getTemperatureData(center[1], center[0]);
       if (!data) return;
 
@@ -60,14 +79,26 @@ export function TemperatureLayer({ map, center, visible }: TemperatureLayerProps
       }
 
       dataRef.current = { temp: data.temp, grid };
-      drawHeatmap();
+      canvas.style.opacity = '0.6';
+      
+      if (!isDestroyed) {
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+        animationFrameRef.current = requestAnimationFrame(drawHeatmap);
+      }
     }
 
     function drawHeatmap() {
-      if (!dataRef.current) return;
+      if (!dataRef.current || isDestroyed) return;
       
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawTemperatureHeatmap(ctx, canvas.width, canvas.height, dataRef.current.grid);
+      
+      try {
+        drawTemperatureHeatmap(ctx, canvas.width, canvas.height, dataRef.current.grid);
+      } catch (error) {
+        console.error('Error drawing temperature heatmap:', error);
+      }
     }
 
     // Initialize
@@ -77,28 +108,32 @@ export function TemperatureLayer({ map, center, visible }: TemperatureLayerProps
     // Update on map move/zoom
     const moveEndListener = () => {
       if (!map.getView().getAnimating()) {
-      resizeCanvas();
-      drawHeatmap();
+        resizeCanvas();
+        updateTemperatureData();
       }
     };
     map.on('moveend', moveEndListener);
 
     return () => {
-      if (canvasRef.current?.parentNode) {
-        canvasRef.current.parentNode.removeChild(canvasRef.current);
-      }
+      isDestroyed = true;
       map.un('moveend', moveEndListener);
+      
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      
+      if (canvas && canvas.parentNode === viewport) {
+        canvas.style.opacity = '0';
+        // Give time for the fade out animation
+        setTimeout(() => {
+          if (canvas.parentNode === viewport) {
+            canvas.parentNode.removeChild(canvas);
+          }
+        }, 300);
+      }
+      canvasRef.current = null;
     };
   }, [map, visible, center]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 pointer-events-none z-10"
-      style={{ 
-        opacity: visible ? 0.6 : 0,
-        transition: 'opacity 0.3s ease-in-out'
-      }}
-    />
-  );
+  return null;
 }

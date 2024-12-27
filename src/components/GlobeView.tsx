@@ -151,11 +151,24 @@ export function GlobeView({ center, show, onToggle }: GlobeViewProps) {
     window.addEventListener('resize', handleResize);
 
     // Cleanup
+    let rendererElement = renderer.domElement;
     return () => {
-      if (containerRef.current) {
-        containerRef.current.removeChild(renderer.domElement);
+      if (rendererElement && rendererElement.parentNode) {
+        rendererElement.parentNode.removeChild(rendererElement);
+        rendererElement = null;
       }
       window.removeEventListener('resize', handleResize);
+      
+      // Dispose of Three.js resources
+      renderer.dispose();
+      geometry.dispose();
+      material.dispose();
+      texture.dispose();
+      markerGeometry.dispose();
+      markerMaterial.dispose();
+      starsGeometry.dispose();
+      starsMaterial.dispose();
+      spaceTexture.dispose();
     };
   }, []);
 
@@ -178,7 +191,7 @@ export function GlobeView({ center, show, onToggle }: GlobeViewProps) {
 
   return (
     <div 
-      className={`fixed left-4 top-16 z-10 transition-all duration-300 transform ${
+      className={`fixed left-4 top-20 sm:top-16 z-10 transition-all duration-300 transform ${
         show ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       } bg-black rounded-lg shadow-lg border border-gray-800 overflow-hidden`}
     >

@@ -70,7 +70,7 @@ export function SearchBox({ onLocationSelect }: SearchBoxProps) {
   return (
     <div 
       ref={dropdownRef}
-      className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-full max-w-md"
+      className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-[calc(100%-2rem)] max-w-md px-2 sm:px-0"
     >
       <div className="relative">
         <input
@@ -78,7 +78,7 @@ export function SearchBox({ onLocationSelect }: SearchBoxProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for a location..."
-          className="w-full px-4 py-3 pl-10 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg 
+          className="w-full px-4 py-2 sm:py-3 pl-10 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg 
                    border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50
                    rounded-b-lg transition-all duration-200 hover:shadow-xl"
         />
