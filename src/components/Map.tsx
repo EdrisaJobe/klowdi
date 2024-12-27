@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Map from 'ol/Map';
 import View from 'ol/View';
+import { defaults as defaultInteractions } from 'ol/interaction';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import Feature from 'ol/Feature';
+import { MapBrowserEvent } from 'ol';
 import Point from 'ol/geom/Point';
-import { Style, Icon } from 'ol/style';
 import OSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 import { Overlay } from 'ol';
@@ -27,10 +27,11 @@ import { GlobeView } from './GlobeView';
 interface MapComponentProps {
   center?: [number, number];
   ready?: boolean;
+  weatherData?: any;
   onLocationSelect?: (lat: number, lon: number) => void;
 }
 
-export function MapComponent({ center = [0, 0], ready = false, onLocationSelect }: MapComponentProps) {
+export function MapComponent({ center = [0, 0], ready = false, weatherData, onLocationSelect }: MapComponentProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<Map | null>(null);
@@ -50,12 +51,11 @@ export function MapComponent({ center = [0, 0], ready = false, onLocationSelect 
     const markerSource = new VectorSource();
     const markerLayer = new VectorLayer({
       source: markerSource,
-      zIndex: 100, // Ensure marker is always on top
+      zIndex: 100,
     });
 
     markerLayerRef.current = markerLayer;
     
-    // Create overlay for coordinates popup
     overlayRef.current = new Overlay({
       element: popupRef.current!,
       positioning: 'bottom-center',
@@ -66,23 +66,15 @@ export function MapComponent({ center = [0, 0], ready = false, onLocationSelect 
     mapInstanceRef.current = new Map({
       target: mapRef.current,
       layers: [
-        new TileLayer({ // Base map layer
+        new TileLayer({
           zIndex: 0,
           source: new OSM({
             maxZoom: 19,
             crossOrigin: 'anonymous',
-            imageSmoothing: false, // Disable image smoothing for better performance
-            // Use multiple subdomains for parallel requests
-            urls: [
-              'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
-            ]
+            url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           }),
-          // Optimize tile loading
           preload: 4,
-          useInterimTilesOnError: true,
-          renderMode: 'image' // Use image rendering for better performance
+          useInterimTilesOnError: true
         }),
         markerLayer,
       ],
@@ -90,34 +82,27 @@ export function MapComponent({ center = [0, 0], ready = false, onLocationSelect 
       view: new View({
         center: fromLonLat(center),
         zoom: 4,
-        constrainResolution: true,
-        // Optimize view settings
-        constrainOnlyCenter: true,
+        enableRotation: false,
         maxZoom: 19,
-        minZoom: 2,
-        // Smooth zoom settings
-        zoomDuration: 200,
-        zoomFactor: 1.5,
-        constrainResolution: false,
-        multiWorld: false
+        minZoom: 2
       }),
-      // Performance settings
       pixelRatio: window.devicePixelRatio > 1 ? 2 : 1,
-      loadTilesWhileAnimating: true,
-      loadTilesWhileInteracting: true,
-      moveTolerance: 1
+      interactions: defaultInteractions({
+        mouseWheelZoom: true,
+        doubleClickZoom: true,
+        dragPan: true,
+        pinchRotate: false
+      })
     });
 
-    // Add pointer cursor on marker hover
-    const handlePointerMove = (evt) => {
+    const handlePointerMove = (evt: MapBrowserEvent<UIEvent>) => {
       const pixel = mapInstanceRef.current!.getEventPixel(evt.originalEvent);
       const hit = mapInstanceRef.current!.hasFeatureAtPixel(pixel);
       mapRef.current!.style.cursor = hit ? 'pointer' : '';
     };
     mapInstanceRef.current.on('pointermove', handlePointerMove);
 
-    // Add click handler for marker
-    const handleClick = (evt) => {
+    const handleClick = (evt: MapBrowserEvent<UIEvent>) => {
       const feature = mapInstanceRef.current!.forEachFeatureAtPixel(evt.pixel, (feature) => feature);
       
       if (feature) {
@@ -178,7 +163,12 @@ export function MapComponent({ center = [0, 0], ready = false, onLocationSelect 
         }`} 
       />
       <SatelliteLayer map={mapInstanceRef.current} visible={showSatellite} />
-      <WindLayer map={mapInstanceRef.current} center={center} visible={showWind} />
+      <WindLayer 
+        map={mapInstanceRef.current} 
+        center={center} 
+        visible={showWind}
+        windData={weatherData?.wind}
+      />
       <TemperatureLayer map={mapInstanceRef.current} center={center} visible={showTemp} />
       <RadarLayer map={mapInstanceRef.current} visible={showRadar} />
       <PrecipitationLayer map={mapInstanceRef.current} visible={showPrecipitation} />

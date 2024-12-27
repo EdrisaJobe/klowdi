@@ -49,6 +49,7 @@ function App() {
       <MapComponent
         center={center || [0, 0]}
         ready={center !== null}
+        weatherData={weatherData}
         onLocationSelect={handleLocationSelect}
       />
       {weatherData && <WeatherInfo weather={weatherData} />}

@@ -4,13 +4,16 @@ export function drawWindArrows(
   y: number,
   angle: number,
   speed: number,
-  alpha: number = 0.6
+  alpha: number = 0.6,
+  scale: number = 1
 ) {
-  const length = Math.min(20, speed * 5);
+  // Adjust length based on wind speed with a more reasonable scale
+  const length = Math.min(20, 10 + speed * 0.5) * scale;
   const headLength = length * 0.3;
 
   ctx.save();
   ctx.translate(x, y);
+  // Point arrow in direction of wind flow
   ctx.rotate(angle);
 
   // Draw arrow body
@@ -19,13 +22,13 @@ export function drawWindArrows(
   ctx.lineTo(length, 0);
   
   // Draw arrow head
-  ctx.lineTo(length - headLength, headLength);
+  ctx.lineTo(length - headLength, headLength * 0.8);
   ctx.moveTo(length, 0);
-  ctx.lineTo(length - headLength, -headLength);
+  ctx.lineTo(length - headLength, -headLength * 0.8);
 
   // Style
   ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5 * scale;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.stroke();
