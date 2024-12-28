@@ -70,7 +70,7 @@ export function SearchBox({ onLocationSelect }: SearchBoxProps) {
   return (
     <div 
       ref={dropdownRef}
-      className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-[calc(100%-2rem)] max-w-md px-2 sm:px-0"
+      className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md px-2 sm:px-0"
     >
       <div className="relative">
         <input
@@ -86,7 +86,7 @@ export function SearchBox({ onLocationSelect }: SearchBoxProps) {
         
         {showDropdown && query.trim() !== '' && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-white/90 backdrop-blur-sm 
-                        rounded-lg shadow-lg max-h-60 overflow-auto border border-gray-100
+                        rounded-lg shadow-lg max-h-[50vh] overflow-auto border border-gray-100
                         animate-fadeIn">
             {isLoading ? (
               <div className="p-4 text-center text-gray-500">Loading...</div>
