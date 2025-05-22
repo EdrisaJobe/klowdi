@@ -272,12 +272,20 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         <button
           data-globe-button
           onClick={() => setShowGlobe(!showGlobe)}
-          className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-gray-100/50 
-                   hover:bg-white/90 transition-all duration-200 flex items-center gap-2
-                   hover:shadow-2xl hover:scale-105"
+          className={`group relative bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-xl shadow-lg 
+                   border border-gray-100/50 transition-all duration-300 flex items-center gap-2
+                   hover:bg-white hover:shadow-2xl hover:scale-105 hover:border-blue-200/50
+                   ${showGlobe ? 'bg-blue-50/90 border-blue-200' : ''}`}
         >
-          <Globe className={`w-6 h-6 ${showGlobe ? 'text-blue-500' : 'text-gray-600'}`} />
-          <span className="text-sm font-medium">3D View</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 
+                        group-hover:from-blue-500/5 group-hover:via-blue-500/10 group-hover:to-blue-500/5 
+                        rounded-xl transition-all duration-300" />
+          <Globe className={`w-5 h-5 transition-colors duration-300 
+                          ${showGlobe ? 'text-blue-500' : 'text-gray-600 group-hover:text-blue-500'}`} />
+          <span className={`text-sm font-medium transition-colors duration-300
+                         ${showGlobe ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'}`}>
+            3D View
+          </span>
         </button>
         <button
           data-location-button
@@ -295,18 +303,23 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
                 });
             }
           }}
-          className={`relative bg-white/80 backdrop-blur-md p-2 rounded-xl shadow-xl border border-gray-100/50 
-                   hover:bg-white/90 transition-all duration-200 hover:shadow-2xl hover:scale-105
-                   ${isLocating ? 'location-button-active' : ''}`}
+          className={`group relative bg-white/90 backdrop-blur-md p-2.5 rounded-xl shadow-lg 
+                   border border-gray-100/50 transition-all duration-300
+                   hover:bg-white hover:shadow-2xl hover:scale-105 hover:border-blue-200/50
+                   ${isLocating ? 'location-button-active bg-blue-50/90 border-blue-200' : ''}`}
           title="My Location"
         >
-          <MapPin className="w-6 h-6 text-gray-600" />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 
+                        group-hover:from-blue-500/5 group-hover:via-blue-500/10 group-hover:to-blue-500/5 
+                        rounded-xl transition-all duration-300" />
+          <MapPin className={`w-5 h-5 transition-colors duration-300
+                           ${isLocating ? 'text-blue-500' : 'text-gray-600 group-hover:text-blue-500'}`} />
         </button>
       </div>
       <TopologyView 
         center={center} 
-        width={320}
-        height={160}
+        width={384}
+        height={240}
       />
       <GlobeView 
         center={center}
