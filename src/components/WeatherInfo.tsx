@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Cloud, 
   Droplets, 
@@ -13,7 +13,9 @@ import {
   CloudRain,
   SunDim,
   Sunrise,
-  Sunset
+  Sunset,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import type { WeatherData } from '../types/weather';
 import { getTemperatureColor } from '../utils/colors';
@@ -33,11 +35,14 @@ interface WeatherInfoProps {
 }
 
 export function WeatherInfo({ weather }: WeatherInfoProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 sm:absolute sm:bottom-4 sm:left-4 sm:right-auto z-[15] 
+    <div className={`fixed bottom-0 left-0 right-0 sm:absolute sm:bottom-4 sm:left-4 sm:right-auto z-[15] 
                   bg-white/80 backdrop-blur-md rounded-xl shadow-xl border border-gray-100/50 
-                  transition-all duration-200 hover:shadow-2xl animate-slideUp">
-      <div className="p-4 border-b border-gray-100/50 flex items-center justify-between">
+                  transition-all duration-300 hover:shadow-2xl animate-slideUp overflow-hidden
+                  ${!isExpanded ? 'h-16' : 'h-auto'}`}>
+      <div className="p-4 border-b border-gray-100/50 flex items-center justify-between h-16">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">{weather.name}</h2>
           <div className="flex items-center gap-2 mt-1">
@@ -46,6 +51,16 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
           </div>
         </div>
         <div className="flex items-center gap-2 sm:hidden">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-2 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:shadow-md"
+          >
+            {isExpanded ? (
+              <ChevronDown className="w-5 h-5 text-gray-600" />
+            ) : (
+              <ChevronUp className="w-5 h-5 text-gray-600" />
+            )}
+          </button>
           <button
             onClick={() => {
               const globeButton = document.querySelector('[data-globe-button]');
@@ -71,7 +86,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
         </div>
       </div>
       
-      <div className="p-4">
+      <div className={`p-4 transition-all duration-300 ${!isExpanded ? 'opacity-0 h-0 p-0' : 'opacity-100 h-auto'}`}>
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
