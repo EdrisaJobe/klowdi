@@ -118,7 +118,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
               <Droplets className="w-6 h-6 text-blue-500 animate-pulse" />
               <div>
                 <div className="font-semibold text-gray-800">{weather.main.humidity}%</div>
@@ -126,7 +126,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
               <Gauge className="w-6 h-6 text-emerald-500" />
               <div className="flex-1">
                 <div className="font-semibold text-gray-800">{weather.main.pressure} hPa</div>
@@ -134,7 +134,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
               <SunDim className="w-6 h-6 text-yellow-500" />
               <div>
                 <div className="font-semibold text-gray-800">
@@ -144,7 +144,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
               <CloudRain className="w-6 h-6 text-blue-400" />
               <div>
                 <div className="font-semibold text-gray-800">
@@ -156,7 +156,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
           </div>
           
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
               <Wind 
                 className="w-6 h-6 text-blue-500"
                 style={{ 
@@ -175,7 +175,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
               <Eye className="w-6 h-6 text-indigo-500" />
               <div>
                 <div className="font-semibold text-gray-800">
@@ -185,7 +185,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
               <Sunrise className="w-6 h-6 text-orange-400" />
               <div>
                 <div className="font-semibold text-gray-800">
@@ -195,7 +195,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
               <Sunset className="w-6 h-6 text-purple-400" />
               <div>
                 <div className="font-semibold text-gray-800">
