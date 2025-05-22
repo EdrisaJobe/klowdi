@@ -13,7 +13,7 @@ import { fromLonLat } from 'ol/proj';
 import { Overlay } from 'ol';
 import 'ol/ol.css';
 import { getUserLocation } from '../utils/location';
-import { Globe, MapPin } from 'lucide-react';
+import { Globe, MapPin, Loader2 } from 'lucide-react';
 import { createLocationMarker } from '../utils/map';
 import { LayerControl } from './LayerControl';
 import { WindLayer } from './WindLayer';
@@ -48,6 +48,7 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
   const [showGlobe, setShowGlobe] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [showClouds, setShowClouds] = useState(false);
+  const [isLoadingLayers, setIsLoadingLayers] = useState(false);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -173,8 +174,47 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
     }
   }, [center]);
 
-  const handleToggleWind = () => setShowWind(!showWind);
-  const handleToggleTemp = () => setShowTemp(!showTemp);
+  const handleToggleWind = () => {
+    setIsLoadingLayers(true);
+    setShowWind(!showWind);
+    setTimeout(() => setIsLoadingLayers(false), 1000);
+  };
+
+  const handleToggleTemp = () => {
+    setIsLoadingLayers(true);
+    setShowTemp(!showTemp);
+    setTimeout(() => setIsLoadingLayers(false), 1000);
+  };
+
+  const handleToggleRadar = () => {
+    setIsLoadingLayers(true);
+    setShowRadar(!showRadar);
+    setTimeout(() => setIsLoadingLayers(false), 1000);
+  };
+
+  const handleToggleSatellite = () => {
+    setIsLoadingLayers(true);
+    setShowSatellite(!showSatellite);
+    setTimeout(() => setIsLoadingLayers(false), 1000);
+  };
+
+  const handleTogglePrecipitation = () => {
+    setIsLoadingLayers(true);
+    setShowPrecipitation(!showPrecipitation);
+    setTimeout(() => setIsLoadingLayers(false), 1000);
+  };
+
+  const handleTogglePressure = () => {
+    setIsLoadingLayers(true);
+    setShowPressure(!showPressure);
+    setTimeout(() => setIsLoadingLayers(false), 1000);
+  };
+
+  const handleToggleClouds = () => {
+    setIsLoadingLayers(true);
+    setShowClouds(!showClouds);
+    setTimeout(() => setIsLoadingLayers(false), 1000);
+  };
 
   return (
     <>
@@ -184,6 +224,14 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
           ready ? 'opacity-100' : 'opacity-0'
         }`} 
       />
+      {isLoadingLayers && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50
+                    bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl
+                    border border-gray-100/50 flex items-center gap-2">
+          <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+          <span className="text-sm font-medium text-gray-700">Loading map layers...</span>
+        </div>
+      )}
       <SatelliteLayer map={mapInstanceRef.current} visible={showSatellite} />
       <WindLayer 
         map={mapInstanceRef.current} 
@@ -206,11 +254,11 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         showClouds={showClouds}
         onToggleWind={handleToggleWind} 
         onToggleTemp={handleToggleTemp}
-        onToggleRadar={() => setShowRadar(!showRadar)}
-        onToggleSatellite={() => setShowSatellite(!showSatellite)}
-        onTogglePrecipitation={() => setShowPrecipitation(!showPrecipitation)}
-        onTogglePressure={() => setShowPressure(!showPressure)}
-        onToggleClouds={() => setShowClouds(!showClouds)}
+        onToggleRadar={handleToggleRadar}
+        onToggleSatellite={handleToggleSatellite}
+        onTogglePrecipitation={handleTogglePrecipitation}
+        onTogglePressure={handleTogglePressure}
+        onToggleClouds={handleToggleClouds}
       />
       <div 
         ref={popupRef} 
