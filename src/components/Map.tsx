@@ -209,20 +209,22 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
       />
       <div 
         ref={popupRef} 
-        className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg text-sm hidden
-                border border-blue-100 transform transition-all duration-200 hover:scale-105"
+        className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl text-sm hidden
+                border border-blue-100/50 transform transition-all duration-200 hover:scale-105
+                font-medium text-gray-700"
       >
         Lat: {center[1].toFixed(6)}, Lon: {center[0].toFixed(6)}
       </div>
-      <div className="hidden sm:flex fixed left-4 top-4 z-20 gap-2">
+      <div className="fixed left-4 top-4 z-20 flex gap-2">
         <button
           data-globe-button
           onClick={() => setShowGlobe(!showGlobe)}
-          className="bg-white/90 backdrop-blur-sm p-2 sm:px-4 sm:py-2 rounded-lg shadow-lg border border-gray-100 
-                   hover:bg-gray-50 transition-colors flex items-center gap-2"
+          className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-gray-100/50 
+                   hover:bg-white/90 transition-all duration-200 flex items-center gap-2
+                   hover:shadow-2xl hover:scale-105"
         >
           <Globe className={`w-6 h-6 ${showGlobe ? 'text-blue-500' : 'text-gray-600'}`} />
-          <span className="hidden sm:inline text-sm font-medium">3D View</span>
+          <span className="text-sm font-medium">3D View</span>
         </button>
         <button
           data-location-button
@@ -237,12 +239,12 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
                 .catch(error => {
                   console.error('Failed to get location:', error);
                   setIsLocating(false);
-                  // TODO: Show error toast/notification to user
                 });
             }
           }}
-          className={`relative bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg border border-gray-100 
-                   hover:bg-gray-50 transition-colors ${isLocating ? 'location-button-active' : ''}`}
+          className={`relative bg-white/80 backdrop-blur-md p-2 rounded-xl shadow-xl border border-gray-100/50 
+                   hover:bg-white/90 transition-all duration-200 hover:shadow-2xl hover:scale-105
+                   ${isLocating ? 'location-button-active' : ''}`}
           title="My Location"
         >
           <MapPin className="w-6 h-6 text-gray-600" />
