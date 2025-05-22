@@ -9,6 +9,7 @@ import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import { Style, Icon } from 'ol/style';
 import OSM from 'ol/source/OSM';
+import { Options as OSMOptions } from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 import { Overlay } from 'ol';
 import 'ol/ol.css';
@@ -25,6 +26,7 @@ import { RadarLayer } from './RadarLayer';
 import { TopologyView } from './TopologyView';
 import { GlobeView } from './GlobeView';
 import { CloudLayer } from './CloudLayer';
+import { MapBrowserEvent } from 'ol';
 
 interface MapComponentProps {
   center?: [number, number];
@@ -77,18 +79,11 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
           source: new OSM({
             maxZoom: 19,
             crossOrigin: 'anonymous',
-            imageSmoothing: false, // Disable image smoothing for better performance
-            // Use multiple subdomains for parallel requests
-            urls: [
-              'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
-            ]
+            url: 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
           }),
           // Optimize tile loading
           preload: 4,
           useInterimTilesOnError: true,
-          renderMode: 'image' // Use image rendering for better performance
         }),
         markerLayer,
       ],
@@ -100,13 +95,12 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         maxZoom: 19,
         minZoom: 2,
         // Smooth animations
-        animation: true,
-        animationDuration: 250
+        // animation: true,
+        // animationDuration: 250
+        loadTilesWhileInteracting: true,
       }),
       // Performance settings
       pixelRatio: window.devicePixelRatio > 1 ? 2 : 1,
-      loadTilesWhileAnimating: true,
-      loadTilesWhileInteracting: true,
       // Enable interactions
       interactions: defaultInteractions({
         mouseWheelZoom: true,
@@ -117,7 +111,7 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
     });
 
     // Add pointer cursor on marker hover
-    const handlePointerMove = (evt) => {
+    const handlePointerMove = (evt: MapBrowserEvent<UIEvent>) => {
       const pixel = mapInstanceRef.current!.getEventPixel(evt.originalEvent);
       const hit = mapInstanceRef.current!.hasFeatureAtPixel(pixel);
       mapRef.current!.style.cursor = hit ? 'pointer' : '';
@@ -125,7 +119,7 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
     mapInstanceRef.current.on('pointermove', handlePointerMove);
 
     // Add click handler for marker
-    const handleClick = (evt) => {
+    const handleClick = (evt: MapBrowserEvent<UIEvent>) => {
       const feature = mapInstanceRef.current!.forEachFeatureAtPixel(evt.pixel, (feature) => feature);
       
       if (feature) {
@@ -326,6 +320,11 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         show={showGlobe}
         onToggle={() => setShowGlobe(!showGlobe)}
       />
+      
+      {/* Copyright Footer */}
+      <footer className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center text-sm font-semibold text-gray-800 z-10">
+        Made by Edrisa Jobe - Klowdi copyright &copy; {new Date().getFullYear()}
+      </footer>
     </>
   );
 }
