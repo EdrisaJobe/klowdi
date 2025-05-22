@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wind, Thermometer, Radar, Satellite, CloudRain, Gauge } from 'lucide-react';
+import { Wind, Thermometer, Radar, Satellite, CloudRain, Gauge, Cloud } from 'lucide-react';
 
 interface LayerControlProps {
   showWind: boolean;
@@ -8,12 +8,14 @@ interface LayerControlProps {
   showSatellite: boolean;
   showPrecipitation: boolean;
   showPressure: boolean;
+  showClouds: boolean;
   onToggleWind: () => void;
   onToggleTemp: () => void;
   onToggleRadar: () => void;
   onToggleSatellite: () => void;
   onTogglePrecipitation: () => void;
   onTogglePressure: () => void;
+  onToggleClouds: () => void;
 }
 
 export function LayerControl({
@@ -23,12 +25,14 @@ export function LayerControl({
   showSatellite,
   showPrecipitation,
   showPressure,
+  showClouds,
   onToggleWind, 
   onToggleTemp,
   onToggleRadar,
   onToggleSatellite,
   onTogglePrecipitation,
   onTogglePressure,
+  onToggleClouds,
 }: LayerControlProps) {
   return (
     <div className="fixed sm:absolute top-16 sm:top-32 sm:right-2 z-10 w-full sm:w-auto">
@@ -104,6 +108,18 @@ export function LayerControl({
         >
           <Gauge className={`w-4 h-4 ${showPressure ? 'text-emerald-600' : ''}`} />
           <span className="hidden sm:inline text-sm font-medium">Pressure</span>
+        </button>
+        <button
+          onClick={onToggleClouds}
+          className={`flex-1 sm:w-full flex items-center justify-center sm:justify-start gap-2 p-2 sm:px-3 sm:py-2 rounded-lg
+                   transition-all duration-200 border ${
+                     showClouds 
+                       ? 'bg-sky-50/80 text-sky-700 border-sky-200 shadow-md' 
+                       : 'hover:bg-white/90 text-gray-600 border-transparent hover:shadow-md'
+                   }`}
+        >
+          <Cloud className={`w-4 h-4 ${showClouds ? 'text-sky-600' : ''}`} />
+          <span className="hidden sm:inline text-sm font-medium">Clouds</span>
         </button>
       </div>
     </div>

@@ -24,6 +24,7 @@ import { SatelliteLayer } from './SatelliteLayer';
 import { RadarLayer } from './RadarLayer';
 import { TopologyView } from './TopologyView';
 import { GlobeView } from './GlobeView';
+import { CloudLayer } from './CloudLayer';
 
 interface MapComponentProps {
   center?: [number, number];
@@ -46,6 +47,7 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
   const [showPressure, setShowPressure] = useState(false);
   const [showGlobe, setShowGlobe] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+  const [showClouds, setShowClouds] = useState(false);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -193,6 +195,7 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
       <RadarLayer map={mapInstanceRef.current} visible={showRadar} />
       <PrecipitationLayer map={mapInstanceRef.current} visible={showPrecipitation} />
       <PressureLayer map={mapInstanceRef.current} visible={showPressure} />
+      <CloudLayer map={mapInstanceRef.current} visible={showClouds} />
       <LayerControl 
         showWind={showWind} 
         showTemp={showTemp} 
@@ -200,12 +203,14 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         showSatellite={showSatellite}
         showPrecipitation={showPrecipitation}
         showPressure={showPressure}
+        showClouds={showClouds}
         onToggleWind={handleToggleWind} 
         onToggleTemp={handleToggleTemp}
         onToggleRadar={() => setShowRadar(!showRadar)}
         onToggleSatellite={() => setShowSatellite(!showSatellite)}
         onTogglePrecipitation={() => setShowPrecipitation(!showPrecipitation)}
         onTogglePressure={() => setShowPressure(!showPressure)}
+        onToggleClouds={() => setShowClouds(!showClouds)}
       />
       <div 
         ref={popupRef} 
