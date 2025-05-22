@@ -9,7 +9,11 @@ import {
   Gauge, 
   Sun,
   Globe,
-  MapPin
+  MapPin,
+  CloudRain,
+  SunDim,
+  Sunrise,
+  Sunset
 } from 'lucide-react';
 import type { WeatherData } from '../types/weather';
 import { getTemperatureColor } from '../utils/colors';
@@ -67,8 +71,8 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
         </div>
       </div>
       
-      <div className="p-4 grid grid-cols-2 gap-6">
-        <div className="col-span-2">
+      <div className="p-4">
+        <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
               <span 
@@ -96,50 +100,94 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
             Feels like {Math.round(weather.main.feels_like)}°C
           </div>
         </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 p-2 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
-            <Droplets className="w-6 h-6 text-blue-500 animate-pulse" />
-            <div>
-              <div className="font-semibold text-gray-800">{weather.main.humidity}%</div>
-              <div className="text-sm text-gray-500">Humidity</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3 p-2 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
-            <Gauge className="w-6 h-6 text-emerald-500" />
-            <div>
-              <div className="font-semibold text-gray-800">{weather.main.pressure} hPa</div>
-              <div className="text-sm text-gray-500">Pressure</div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 p-2 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
-            <Wind 
-              className="w-6 h-6 text-blue-500"
-              style={{ 
-                transform: `rotate(${weather.wind.deg}deg)`,
-                transition: 'transform 0.3s ease-in-out'
-              }}
-            />
-            <div>
-              <div className="font-semibold text-gray-800">
-                {weather.wind.speed} m/s
-                <span className="text-gray-500 ml-1 text-sm">
-                  {getWindDirection(weather.wind.deg)}
-                </span>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+              <Droplets className="w-6 h-6 text-blue-500 animate-pulse" />
+              <div>
+                <div className="font-semibold text-gray-800">{weather.main.humidity}%</div>
+                <div className="text-sm text-gray-500">Humidity</div>
               </div>
-              <div className="text-sm text-gray-500">Wind</div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+              <Gauge className="w-6 h-6 text-emerald-500" />
+              <div className="flex-1">
+                <div className="font-semibold text-gray-800">{weather.main.pressure} hPa</div>
+                <div className="text-sm text-gray-500">Surface Pressure</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+              <SunDim className="w-6 h-6 text-yellow-500" />
+              <div>
+                <div className="font-semibold text-gray-800">
+                  {weather.clouds?.all || 0}%
+                </div>
+                <div className="text-sm text-gray-500">Cloud Coverage</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+              <CloudRain className="w-6 h-6 text-blue-400" />
+              <div>
+                <div className="font-semibold text-gray-800">
+                  {Math.round((weather.rain?.['1h'] || 0) * 100)}%
+                </div>
+                <div className="text-sm text-gray-500">Precipitation</div>
+              </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-3 p-2 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
-            <Eye className="w-6 h-6 text-indigo-500" />
-            <div>
-              <div className="font-semibold text-gray-800">10 km</div>
-              <div className="text-sm text-gray-500">Visibility</div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+              <Wind 
+                className="w-6 h-6 text-blue-500"
+                style={{ 
+                  transform: `rotate(${weather.wind.deg}deg)`,
+                  transition: 'transform 0.3s ease-in-out'
+                }}
+              />
+              <div>
+                <div className="font-semibold text-gray-800">
+                  {weather.wind.speed} m/s
+                  <span className="text-gray-500 ml-1 text-sm">
+                    {getWindDirection(weather.wind.deg)}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-500">Wind</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+              <Eye className="w-6 h-6 text-indigo-500" />
+              <div>
+                <div className="font-semibold text-gray-800">
+                  {(weather.visibility / 1000).toFixed(1)} km
+                </div>
+                <div className="text-sm text-gray-500">Visibility</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+              <Sunrise className="w-6 h-6 text-orange-400" />
+              <div>
+                <div className="font-semibold text-gray-800">
+                  {new Date(weather.sys.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+                <div className="text-sm text-gray-500">Sunrise</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200">
+              <Sunset className="w-6 h-6 text-purple-400" />
+              <div>
+                <div className="font-semibold text-gray-800">
+                  {new Date(weather.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+                <div className="text-sm text-gray-500">Sunset</div>
+              </div>
             </div>
           </div>
         </div>

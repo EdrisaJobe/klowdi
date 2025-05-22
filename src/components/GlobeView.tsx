@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 interface GlobeViewProps {
   center: [number, number];
@@ -151,7 +151,7 @@ export function GlobeView({ center, show, onToggle }: GlobeViewProps) {
     window.addEventListener('resize', handleResize);
 
     // Cleanup
-    let rendererElement = renderer.domElement;
+    let rendererElement: HTMLCanvasElement | null = renderer.domElement;
     return () => {
       if (rendererElement && rendererElement.parentNode) {
         rendererElement.parentNode.removeChild(rendererElement);
