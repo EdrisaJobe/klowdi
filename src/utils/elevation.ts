@@ -5,6 +5,7 @@ interface ElevationData extends Array<number> {
   max: number;
 }
 
+///////////////////// THIS IS PRIMARILY FOR CORS BYPASS IN DEVELOPMENT /////////////////////
 function createFallbackElevationData(lat: number, lon: number): ElevationData {
   // Create realistic elevation data based on latitude
   const baseElevation = Math.abs(lat) * 10; // Higher elevations towards poles
@@ -29,11 +30,10 @@ export async function getElevationData(lat: number, lon: number): Promise<Elevat
   console.log('Using fallback elevation data for development');
   return createFallbackElevationData(lat, lon);
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
-/* 
-// Original API implementation - commented out due to CORS issues in development
-// This can be enabled in production with proper CORS configuration
-
+// Original API implementation
+// I can enable this in production with proper CORS configuration
 const ELEVATION_API_URL = 'https://api.open-elevation.com/api/v1/lookup';
 
 interface ElevationResponse {
@@ -80,4 +80,3 @@ export async function getElevationDataFromAPI(lat: number, lon: number): Promise
     return createFallbackElevationData(lat, lon);
   }
 }
-*/
