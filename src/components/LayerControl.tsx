@@ -1,4 +1,3 @@
-import React from 'react';
 import { Wind, Thermometer, Radar, Satellite, CloudRain, Gauge, Cloud } from 'lucide-react';
 
 interface LayerControlProps {

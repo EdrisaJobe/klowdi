@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getElevationData } from '../utils/elevation';
-import { Mountain, Eye, EyeOff, Layers } from 'lucide-react';
+import { Mountain, Eye, Layers } from 'lucide-react';
 
 interface TopologyViewProps {
   center: [number, number];

@@ -1,4 +1,4 @@
-const API_KEY = 'bd5e378503939ddaee76f12ad7a97608';
+const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
 export async function getWindData(lat: number, lon: number) {
   try {

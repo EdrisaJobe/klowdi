@@ -1,18 +1,18 @@
-// List of interesting locations around the world
-const FEATURED_LOCATIONS = [
-  { name: "Mount Fuji", lat: 35.3606, lon: 138.7274 },
-  { name: "Machu Picchu", lat: -13.1631, lon: -72.5450 },
-  { name: "Great Barrier Reef", lat: -18.2871, lon: 147.6992 },
-  { name: "Santorini", lat: 36.3932, lon: 25.4615 },
-  { name: "Victoria Falls", lat: -17.9243, lon: 25.8572 },
-  { name: "Northern Lights (Iceland)", lat: 64.9631, lon: -19.0208 },
-  { name: "Grand Canyon", lat: 36.0544, lon: -112.1401 },
-  { name: "Great Wall of China", lat: 40.4319, lon: 116.5704 },
-  { name: "Petra", lat: 30.3285, lon: 35.4444 },
-  { name: "Taj Mahal", lat: 27.1751, lon: 78.0421 }
+// Popular cities around the world for fallback locations
+const POPULAR_LOCATIONS = [
+  { name: "New York", lat: 40.7128, lon: -74.0060 },
+  { name: "London", lat: 51.5074, lon: -0.1278 },
+  { name: "Tokyo", lat: 35.6762, lon: 139.6503 },
+  { name: "Paris", lat: 48.8566, lon: 2.3522 },
+  { name: "Sydney", lat: -33.8688, lon: 151.2093 },
+  { name: "San Francisco", lat: 37.7749, lon: -122.4194 },
+  { name: "Berlin", lat: 52.5200, lon: 13.4050 },
+  { name: "Toronto", lat: 43.6532, lon: -79.3832 },
+  { name: "Dubai", lat: 25.2048, lon: 55.2708 },
+  { name: "Singapore", lat: 1.3521, lon: 103.8198 }
 ];
 
 export function getRandomLocation() {
-  const randomIndex = Math.floor(Math.random() * FEATURED_LOCATIONS.length);
-  return FEATURED_LOCATIONS[randomIndex];
-}
+  const randomIndex = Math.floor(Math.random() * POPULAR_LOCATIONS.length);
+  return POPULAR_LOCATIONS[randomIndex];
+} 

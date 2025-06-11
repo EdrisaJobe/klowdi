@@ -1,8 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { fromLonLat, toLonLat } from 'ol/proj';
-import { Coordinate } from 'ol/coordinate';
+import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
-import { getWindData } from '../utils/weather';
 import { drawWindArrows } from '../utils/canvas';
 
 interface WindLayerProps {
@@ -13,7 +10,6 @@ interface WindLayerProps {
 }
 
 export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   const particlesRef = useRef<Array<{ x: number; y: number; speed: number; angle: number }>>([]);
   const lastWindDataRef = useRef(windData);
@@ -27,7 +23,6 @@ export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
     canvas.style.opacity = visible ? '0.7' : '0';
     canvas.style.transition = 'opacity 0.3s ease-in-out';
     viewport.appendChild(canvas);
-    canvasRef.current = canvas;
     
     // Update last wind data reference
     if (windData) {
@@ -38,6 +33,7 @@ export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
     let isAnimating = visible;
 
     function resizeCanvas() {
+      if (!map) return;
       const size = map.getSize();
       if (!size) return;
       canvas.width = size[0];
@@ -45,11 +41,12 @@ export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
     }
 
     async function initializeParticles() {
+      if (!map) return;
       const view = map.getView();
       const zoom = view.getZoom() || 4;
-      const extent = view.calculateExtent();
       
       if (!lastWindDataRef.current) return;
+      const windData = lastWindDataRef.current;
 
       // Create particles based on zoom level
       const particleCount = Math.min(200, Math.max(100, Math.floor(400 / Math.pow(2, zoom - 8))));
@@ -60,14 +57,14 @@ export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
         return {
           x,
           y,
-          speed: lastWindDataRef.current.speed * 0.05, // Even slower animation
-          angle: (lastWindDataRef.current.deg * Math.PI) / 180
+          speed: windData.speed * 0.05, // Even slower animation
+          angle: (windData.deg * Math.PI) / 180
         };
       });
     }
 
     function animate() {
-      if (!isAnimating) return;
+      if (!isAnimating || !map) return;
       
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const view = map.getView();
@@ -144,7 +141,6 @@ export function WindLayer({ map, center, visible, windData }: WindLayerProps) {
       if (canvas && canvas.parentNode === viewport) {
         canvas.parentNode.removeChild(canvas);
       }
-      canvasRef.current = null;
     };
   }, [map, visible, center, windData]);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
@@ -8,7 +8,6 @@ interface SatelliteLayerProps {
   visible: boolean;
 }
 
-const SATELLITE_API_KEY = 'bd5e378503939ddaee76f12ad7a97608';
 
 export function SatelliteLayer({ map, visible }: SatelliteLayerProps) {
   const layerRef = useRef<TileLayer<XYZ> | null>(null);

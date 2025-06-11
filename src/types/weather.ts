@@ -21,5 +21,16 @@ export interface WeatherData {
     speed: number;
     deg: number;
   };
+  clouds?: {
+    all: number;
+  };
+  rain?: {
+    '1h'?: number;
+  };
+  visibility?: number;
+  sys?: {
+    sunrise: number;
+    sunset: number;
+  };
   name: string;
 }

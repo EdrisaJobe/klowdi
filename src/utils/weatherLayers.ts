@@ -1,7 +1,7 @@
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
 
-const API_KEY = 'aa237aa0b8bfefa9b4156b04460b1e24';
+const API_KEY = import.meta.env.VITE_OPENWEATHER_ALT_API_KEY;
 
 export function createWindLayer() {
   return new TileLayer({

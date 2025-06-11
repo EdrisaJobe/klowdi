@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
 import { getTemperatureData } from '../utils/weather';
 import { drawTemperatureHeatmap } from '../utils/canvas';
@@ -10,7 +10,6 @@ interface TemperatureLayerProps {
 }
 
 export function TemperatureLayer({ map, center, visible }: TemperatureLayerProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const dataRef = useRef<{ temp: number; grid: number[][] } | null>(null);
   const animationFrameRef = useRef<number>();
 
@@ -28,12 +27,12 @@ export function TemperatureLayer({ map, center, visible }: TemperatureLayerProps
       transition: opacity 0.3s ease-in-out;
     `;
     viewport.appendChild(canvas);
-    canvasRef.current = canvas;
     
     const ctx = canvas.getContext('2d', { alpha: true })!;
     let isDestroyed = false;
 
     function resizeCanvas() {
+      if (!map) return;
       const size = map.getSize();
       if (!size) return;
       canvas.width = size[0];
@@ -131,7 +130,6 @@ export function TemperatureLayer({ map, center, visible }: TemperatureLayerProps
           }
         }, 300);
       }
-      canvasRef.current = null;
     };
   }, [map, visible, center]);
 

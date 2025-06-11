@@ -1,4 +1,3 @@
-import React from 'react';
 import { MapPin, Cloud, Sun, Wind } from 'lucide-react';
 
 export function LoadingOverlay() {

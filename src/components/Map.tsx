@@ -5,11 +5,8 @@ import { defaults as defaultInteractions } from 'ol/interaction';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
-import { Style, Icon } from 'ol/style';
 import OSM from 'ol/source/OSM';
-import { Options as OSMOptions } from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 import { Overlay } from 'ol';
 import 'ol/ol.css';
@@ -27,11 +24,12 @@ import { TopologyView } from './TopologyView';
 import { GlobeView } from './GlobeView';
 import { CloudLayer } from './CloudLayer';
 import { MapBrowserEvent } from 'ol';
+import type { WeatherData } from '../types/weather';
 
 interface MapComponentProps {
   center?: [number, number];
   ready?: boolean;
-  weatherData?: any;
+  weatherData?: WeatherData;
   onLocationSelect?: (lat: number, lon: number) => void;
 }
 
@@ -58,12 +56,11 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
     const markerSource = new VectorSource();
     const markerLayer = new VectorLayer({
       source: markerSource,
-      zIndex: 100, // Ensure marker is always on top
+      zIndex: 100,
     });
 
     markerLayerRef.current = markerLayer;
     
-    // Create overlay for coordinates popup
     overlayRef.current = new Overlay({
       element: popupRef.current!,
       positioning: 'bottom-center',
@@ -74,14 +71,13 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
     mapInstanceRef.current = new Map({
       target: mapRef.current,
       layers: [
-        new TileLayer({ // Base map layer
+        new TileLayer({
           zIndex: 0,
           source: new OSM({
             maxZoom: 19,
             crossOrigin: 'anonymous',
             url: 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
           }),
-          // Optimize tile loading
           preload: 4,
           useInterimTilesOnError: true,
         }),
@@ -94,14 +90,8 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         enableRotation: false,
         maxZoom: 19,
         minZoom: 2,
-        // Smooth animations
-        // animation: true,
-        // animationDuration: 250
-        loadTilesWhileInteracting: true,
       }),
-      // Performance settings
       pixelRatio: window.devicePixelRatio > 1 ? 2 : 1,
-      // Enable interactions
       interactions: defaultInteractions({
         mouseWheelZoom: true,
         doubleClickZoom: true,
@@ -110,7 +100,6 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
       })
     });
 
-    // Add pointer cursor on marker hover
     const handlePointerMove = (evt: MapBrowserEvent<UIEvent>) => {
       const pixel = mapInstanceRef.current!.getEventPixel(evt.originalEvent);
       const hit = mapInstanceRef.current!.hasFeatureAtPixel(pixel);
@@ -118,13 +107,11 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
     };
     mapInstanceRef.current.on('pointermove', handlePointerMove);
 
-    // Add click handler for marker
     const handleClick = (evt: MapBrowserEvent<UIEvent>) => {
       const feature = mapInstanceRef.current!.forEachFeatureAtPixel(evt.pixel, (feature) => feature);
       
       if (feature) {
         const coordinates = (feature.getGeometry() as Point).getCoordinates();
-        const [lon, lat] = coordinates.map((coord: number) => coord.toFixed(6));
         if (popupRef.current) {
           popupRef.current.style.display = 'block';
           overlayRef.current!.setPosition(coordinates);
@@ -151,7 +138,6 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
 
   useEffect(() => {
     if (mapInstanceRef.current) {
-      // Clear existing markers
       const source = markerLayerRef.current?.getSource();
       if (source) {
         source.clear();
@@ -163,50 +149,14 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         center: fromLonLat(center),
         zoom: 12,
         duration: 400,
-        easing: (t) => t * (2 - t) // Smooth easing function
+        easing: (t) => t * (2 - t)
       });
     }
   }, [center]);
 
-  const handleToggleWind = () => {
+  const handleToggleLayer = (setter: React.Dispatch<React.SetStateAction<boolean>>, current: boolean) => {
     setIsLoadingLayers(true);
-    setShowWind(!showWind);
-    setTimeout(() => setIsLoadingLayers(false), 1000);
-  };
-
-  const handleToggleTemp = () => {
-    setIsLoadingLayers(true);
-    setShowTemp(!showTemp);
-    setTimeout(() => setIsLoadingLayers(false), 1000);
-  };
-
-  const handleToggleRadar = () => {
-    setIsLoadingLayers(true);
-    setShowRadar(!showRadar);
-    setTimeout(() => setIsLoadingLayers(false), 1000);
-  };
-
-  const handleToggleSatellite = () => {
-    setIsLoadingLayers(true);
-    setShowSatellite(!showSatellite);
-    setTimeout(() => setIsLoadingLayers(false), 1000);
-  };
-
-  const handleTogglePrecipitation = () => {
-    setIsLoadingLayers(true);
-    setShowPrecipitation(!showPrecipitation);
-    setTimeout(() => setIsLoadingLayers(false), 1000);
-  };
-
-  const handleTogglePressure = () => {
-    setIsLoadingLayers(true);
-    setShowPressure(!showPressure);
-    setTimeout(() => setIsLoadingLayers(false), 1000);
-  };
-
-  const handleToggleClouds = () => {
-    setIsLoadingLayers(true);
-    setShowClouds(!showClouds);
+    setter(!current);
     setTimeout(() => setIsLoadingLayers(false), 1000);
   };
 
@@ -246,13 +196,13 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         showPrecipitation={showPrecipitation}
         showPressure={showPressure}
         showClouds={showClouds}
-        onToggleWind={handleToggleWind} 
-        onToggleTemp={handleToggleTemp}
-        onToggleRadar={handleToggleRadar}
-        onToggleSatellite={handleToggleSatellite}
-        onTogglePrecipitation={handleTogglePrecipitation}
-        onTogglePressure={handleTogglePressure}
-        onToggleClouds={handleToggleClouds}
+        onToggleWind={() => handleToggleLayer(setShowWind, showWind)}
+        onToggleTemp={() => handleToggleLayer(setShowTemp, showTemp)}
+        onToggleRadar={() => handleToggleLayer(setShowRadar, showRadar)}
+        onToggleSatellite={() => handleToggleLayer(setShowSatellite, showSatellite)}
+        onTogglePrecipitation={() => handleToggleLayer(setShowPrecipitation, showPrecipitation)}
+        onTogglePressure={() => handleToggleLayer(setShowPressure, showPressure)}
+        onToggleClouds={() => handleToggleLayer(setShowClouds, showClouds)}
       />
       <div 
         ref={popupRef} 
@@ -318,7 +268,6 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
       <GlobeView 
         center={center}
         show={showGlobe}
-        onToggle={() => setShowGlobe(!showGlobe)}
       />
       
       {/* Copyright Footer */}

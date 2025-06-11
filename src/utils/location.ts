@@ -106,7 +106,7 @@ export async function getUserLocation(): Promise<{ latitude: number; longitude: 
     };
     cacheLocation(location);
     return location;
-  } catch (error) {
+  } catch {
     // Fall back to IP-based location
     const ipLocation = await getIPLocation();
     cacheLocation(ipLocation);

@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
-import { getWeatherData } from '../utils/weather';
+import { getCloudData } from '../utils/weather';
 import { drawWeatherEffects } from '../utils/canvas';
 
 interface WeatherLayerProps {
-  map: Map | null;
+  map: Map;
   center: [number, number];
   visible: boolean;
 }
@@ -28,9 +28,9 @@ export function WeatherLayer({ map, center, visible }: WeatherLayerProps) {
     }
 
     async function updateWeather() {
-      const data = await getWeatherData(center[1], center[0]);
+      const data = await getCloudData(center[1], center[0]);
       if (!data) return;
-      weatherRef.current = data.weather[0].main;
+      weatherRef.current = data.weather.main;
       animate();
     }
 

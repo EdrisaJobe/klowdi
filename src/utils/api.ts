@@ -1,8 +1,8 @@
 import type { LocationSuggestion } from '../types/location';
 import type { WeatherData } from '../types/weather';
 
-const API_KEY = 'bd5e378503939ddaee76f12ad7a97608';
 const BASE_URL = 'https://api.openweathermap.org/';
+const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
 export async function searchLocations(
   query: string

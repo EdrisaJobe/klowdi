@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
@@ -8,7 +8,7 @@ interface CloudLayerProps {
   visible: boolean;
 }
 
-const API_KEY = 'bd5e378503939ddaee76f12ad7a97608';
+const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
 export function CloudLayer({ map, visible }: CloudLayerProps) {
   const layerRef = useRef<TileLayer<XYZ> | null>(null);
@@ -35,7 +35,7 @@ export function CloudLayer({ map, visible }: CloudLayerProps) {
     }
 
     return () => {
-      if (layerRef.current) {
+      if (layerRef.current && map) {
         map.removeLayer(layerRef.current);
       }
     };

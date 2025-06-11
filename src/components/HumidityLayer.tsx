@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
@@ -8,7 +8,7 @@ interface HumidityLayerProps {
   visible: boolean;
 }
 
-const API_KEY = 'bd5e378503939ddaee76f12ad7a97608';
+const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
 export function HumidityLayer({ map, visible }: HumidityLayerProps) {
   const layerRef = useRef<TileLayer<XYZ> | null>(null);

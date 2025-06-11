@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
 import { getRainData } from '../utils/weather';
 import { drawRaindrops } from '../utils/canvas';
 
 interface RainLayerProps {
-  map: Map | null;
+  map: Map;
   center: [number, number];
   visible: boolean;
 }
@@ -32,7 +32,7 @@ export function RainLayer({ map, center, visible }: RainLayerProps) {
       const rainData = await getRainData(center[1], center[0]);
       if (!rainData) return;
       
-      const { weather, rain } = rainData;
+      const { weather } = rainData;
       weatherRef.current = {
         isRaining: weather.main === 'Rain',
       };

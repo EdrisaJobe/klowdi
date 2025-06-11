@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   Cloud, 
   Droplets, 
   Wind, 
   ArrowUp, 
-  Thermometer, 
   Eye, 
   Gauge, 
-  Sun,
   Globe,
   MapPin,
   CloudRain,
@@ -55,30 +53,16 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
             onClick={() => setIsExpanded(!isExpanded)}
             className="p-2 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:shadow-md"
           >
-            {isExpanded ? (
-              <ChevronDown className="w-5 h-5 text-gray-600" />
-            ) : (
-              <ChevronUp className="w-5 h-5 text-gray-600" />
-            )}
+            {isExpanded ? <ChevronDown className="w-5 h-5 text-gray-600" /> : <ChevronUp className="w-5 h-5 text-gray-600" />}
           </button>
           <button
-            onClick={() => {
-              const globeButton = document.querySelector('[data-globe-button]');
-              if (globeButton) {
-                (globeButton as HTMLButtonElement).click();
-              }
-            }}
+            onClick={() => (document.querySelector('[data-globe-button]') as HTMLElement)?.click()}
             className="p-2 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:shadow-md"
           >
             <Globe className="w-5 h-5 text-gray-600" />
           </button>
           <button
-            onClick={() => {
-              const locationButton = document.querySelector('[data-location-button]');
-              if (locationButton) {
-                (locationButton as HTMLButtonElement).click();
-              }
-            }}
+            onClick={() => (document.querySelector('[data-location-button]') as HTMLElement)?.click()}
             className="p-2 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:shadow-md"
           >
             <MapPin className="w-5 h-5 text-gray-600" />
@@ -118,94 +102,43 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-              <Droplets className="w-6 h-6 text-blue-500 animate-pulse" />
-              <div>
-                <div className="font-semibold text-gray-800">{weather.main.humidity}%</div>
-                <div className="text-sm text-gray-500">Humidity</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-              <Gauge className="w-6 h-6 text-emerald-500" />
-              <div className="flex-1">
-                <div className="font-semibold text-gray-800">{weather.main.pressure} hPa</div>
-                <div className="text-sm text-gray-500">Surface Pressure</div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-              <SunDim className="w-6 h-6 text-yellow-500" />
-              <div>
-                <div className="font-semibold text-gray-800">
-                  {weather.clouds?.all || 0}%
-                </div>
-                <div className="text-sm text-gray-500">Cloud Coverage</div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-              <CloudRain className="w-6 h-6 text-blue-400" />
-              <div>
-                <div className="font-semibold text-gray-800">
-                  {Math.round((weather.rain?.['1h'] || 0) * 100)}%
-                </div>
-                <div className="text-sm text-gray-500">Precipitation</div>
-              </div>
-            </div>
+            <WeatherCard icon={<Droplets className="w-6 h-6 text-blue-500 animate-pulse" />} value={`${weather.main.humidity}%`} label="Humidity" />
+            <WeatherCard icon={<Gauge className="w-6 h-6 text-emerald-500" />} value={`${weather.main.pressure} hPa`} label="Surface Pressure" />
+            <WeatherCard icon={<SunDim className="w-6 h-6 text-yellow-500" />} value={`${weather.clouds?.all || 0}%`} label="Cloud Coverage" />
+            <WeatherCard icon={<CloudRain className="w-6 h-6 text-blue-400" />} value={`${Math.round((weather.rain?.['1h'] || 0) * 100)}%`} label="Precipitation" />
           </div>
           
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-              <Wind 
-                className="w-6 h-6 text-blue-500"
-                style={{ 
-                  transform: `rotate(${weather.wind.deg}deg)`,
-                  transition: 'transform 0.3s ease-in-out'
-                }}
-              />
-              <div>
-                <div className="font-semibold text-gray-800">
-                  {weather.wind.speed} m/s
-                  <span className="text-gray-500 ml-1 text-sm">
-                    {getWindDirection(weather.wind.deg)}
-                  </span>
-                </div>
-                <div className="text-sm text-gray-500">Wind</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-              <Eye className="w-6 h-6 text-indigo-500" />
-              <div>
-                <div className="font-semibold text-gray-800">
-                  {(weather.visibility / 1000).toFixed(1)} km
-                </div>
-                <div className="text-sm text-gray-500">Visibility</div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-              <Sunrise className="w-6 h-6 text-orange-400" />
-              <div>
-                <div className="font-semibold text-gray-800">
-                  {new Date(weather.sys.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-                <div className="text-sm text-gray-500">Sunrise</div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-              <Sunset className="w-6 h-6 text-purple-400" />
-              <div>
-                <div className="font-semibold text-gray-800">
-                  {new Date(weather.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-                <div className="text-sm text-gray-500">Sunset</div>
-              </div>
-            </div>
+            <WeatherCard 
+              icon={<Wind className="w-6 h-6 text-blue-500" style={{ transform: `rotate(${weather.wind.deg}deg)`, transition: 'transform 0.3s ease-in-out' }} />} 
+              value={`${weather.wind.speed} m/s ${getWindDirection(weather.wind.deg)}`} 
+              label="Wind" 
+            />
+            <WeatherCard icon={<Eye className="w-6 h-6 text-indigo-500" />} value={`${((weather.visibility || 0) / 1000).toFixed(1)} km`} label="Visibility" />
+            <WeatherCard 
+              icon={<Sunrise className="w-6 h-6 text-orange-400" />} 
+              value={weather.sys ? new Date(weather.sys.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'} 
+              label="Sunrise" 
+            />
+            <WeatherCard 
+              icon={<Sunset className="w-6 h-6 text-purple-400" />} 
+              value={weather.sys ? new Date(weather.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'} 
+              label="Sunset" 
+            />
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function WeatherCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-200 hover:scale-105 hover:shadow-lg">
+      {icon}
+      <div>
+        <div className="font-semibold text-gray-800">{value}</div>
+        <div className="text-sm text-gray-500">{label}</div>
       </div>
     </div>
   );
