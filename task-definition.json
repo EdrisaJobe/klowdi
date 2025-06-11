@@ -1,0 +1,29 @@
+{
+    "family": "klowdi-task",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "512",
+    "memory": "1024",
+    "executionRoleArn": "arn:aws:iam::470699573094:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "name": "klowdi-container",
+            "image": "470699573094.dkr.ecr.us-east-2.amazonaws.com/klowdi:latest",
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/klowdi-task",
+                    "awslogs-region": "us-east-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ]
+}
