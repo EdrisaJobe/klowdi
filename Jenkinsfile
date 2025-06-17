@@ -11,14 +11,14 @@ pipeline {
     }
     
     stages {
-        stage('🔍 Checkout') {
+        stage('Checkout') {
             steps {
                 echo 'Checking out source code...'
                 checkout scm
             }
         }
         
-        stage('🏗️ Build React App') {
+        stage('Build React App') {
             steps {
                 echo 'Installing dependencies and building React app...'
                 sh 'npm ci'
@@ -26,7 +26,7 @@ pipeline {
             }
         }
         
-        stage('🐳 Build Docker Image') {
+        stage('Build Docker Image') {
             steps {
                 script {
                     echo 'Building Docker image for AMD64 platform...'
@@ -36,7 +36,7 @@ pipeline {
             }
         }
         
-        stage('🔐 Login to ECR') {
+        stage('Login to ECR') {
             steps {
                 echo 'Logging into AWS ECR...'
                 sh '''
@@ -45,7 +45,7 @@ pipeline {
             }
         }
         
-        stage('📤 Push to ECR') {
+        stage('Push to ECR') {
             steps {
                 echo 'Pushing Docker images to ECR...'
                 sh "docker push ${ECR_REPO}:${BUILD_NUMBER}"
@@ -53,7 +53,7 @@ pipeline {
             }
         }
         
-        stage('🚀 Deploy to ECS') {
+        stage('Deploy to ECS') {
             steps {
                 echo 'Deploying to AWS ECS...'
                 sh '''
@@ -66,7 +66,7 @@ pipeline {
             }
         }
         
-        stage('✅ Verify Deployment') {
+        stage('Verify Deployment') {
             steps {
                 echo 'Waiting for deployment to complete...'
                 sh '''
@@ -75,7 +75,7 @@ pipeline {
                         --services ${ECS_SERVICE} \
                         --region ${AWS_REGION}
                     
-                    echo "✅ Deployment completed successfully!"
+                    echo "Deployment completed successfully!"
                 '''
             }
         }
@@ -87,10 +87,10 @@ pipeline {
             sh 'docker system prune -f || true'
         }
         success {
-            echo '🎉 Pipeline executed successfully!'
+            echo 'Pipeline executed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed. Check logs for details.'
+            echo 'Pipeline failed. Check logs for details.'
         }
     }
 } 
