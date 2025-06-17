@@ -14,7 +14,15 @@ export default defineConfig({
     // This port is only for development
     port: 5173,
     // host binding
-    host: true
+    host: true,
+    // Proxy API requests to backend server
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   },
   // This helps with routing issues
   preview: {

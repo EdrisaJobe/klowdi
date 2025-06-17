@@ -1,8 +1,8 @@
 import type { LocationSuggestion } from '../types/location';
 import type { WeatherData } from '../types/weather';
 
-const BASE_URL = 'https://api.openweathermap.org/';
-const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+// Use backend proxy routes instead of direct API calls
+const BASE_URL = '/api';
 
 export async function searchLocations(
   query: string
@@ -13,7 +13,7 @@ export async function searchLocations(
   
   try {
     const response = await fetch(
-      `${BASE_URL}geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
+      `${BASE_URL}/search?q=${encodeURIComponent(query)}`
     );
   
     if (!response.ok) {
@@ -56,7 +56,7 @@ export async function searchLocations(
 export async function getWeatherData(lat: number, lon: number): Promise<WeatherData> {
   try {
     const response = await fetch(
-      `${BASE_URL}data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+      `${BASE_URL}/weather?lat=${lat}&lon=${lon}`
     );
   
     if (!response.ok) {
