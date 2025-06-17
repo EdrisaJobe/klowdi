@@ -7,6 +7,11 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() })
+})
+
 // serve static files from dist
 app.use(express.static(path.join(__dirname, 'dist')))
 
@@ -16,6 +21,9 @@ app.get('*', (req, res) => {
 })
 
 const port = process.env.PORT || 3000
-app.listen(port, () => {
-  console.log(`Serving content from: ${port} | ${path.join(__dirname, 'dist')}`)
+app.listen(port, '0.0.0.0', () => {
+  console.log(`✅ Server running on port ${port}`)
+  console.log(`📁 Serving from: ${path.join(__dirname, 'dist')}`)
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)
+  console.log(`🏥 Health check: http://localhost:${port}/health`)
 })
