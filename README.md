@@ -1,4 +1,4 @@
-# 🌦️ Klowdi - Weather App with Enterprise Infrastructure
+# 🌦️ Klowdi - Weather App
 
 ![Klowdi Screenshot](https://i.ibb.co/kQkVsGr/files-2083263-1735252761431-image.png)  
 *A React/TypeScript weather app demonstrating dual-platform deployment and enterprise CI/CD*
