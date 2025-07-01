@@ -272,7 +272,7 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
       
       {/* Copyright Footer */}
       <footer className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center text-sm font-semibold text-gray-800 z-10">
-       © {new Date().getFullYear()} Klowdi. Made by Edrisa Jobe.
+       © {new Date().getFullYear()} Klowdi. All rights reserved. Made by Edrisa Jobe.
       </footer>
     </>
   );
