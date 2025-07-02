@@ -275,7 +275,6 @@ export async function searchLocations(
       data: locations
     };
   } catch (error) {
-    console.error('Error in searchLocations:', error);
     return {
       data: [],
       error: error instanceof Error ? error.message : 'Failed to search locations'
@@ -284,15 +283,9 @@ export async function searchLocations(
 }
 
 export async function getWeatherData(lat: number, lon: number): Promise<WeatherData> {
-  try {
-    // Add a small delay to simulate API call
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const weatherData = generateMockWeatherData(lat, lon);
-    
-    return weatherData;
-  } catch (error) {
-    console.error('Error fetching weather data:', error);
-    throw error;
-  }
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  const weatherData = generateMockWeatherData(lat, lon);
+  
+  return weatherData;
 }
