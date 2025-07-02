@@ -16,6 +16,12 @@ export function PressureLayer({ map, visible }: PressureLayerProps) {
   useEffect(() => {
     if (!map) return;
 
+    // Don't create the layer if API key is not available
+    if (!API_KEY) {
+      console.warn('OpenWeather API key not found. Pressure layer disabled.');
+      return;
+    }
+
     if (!layerRef.current) {
       layerRef.current = new TileLayer({
         source: new XYZ({
@@ -23,7 +29,7 @@ export function PressureLayer({ map, visible }: PressureLayerProps) {
           crossOrigin: 'anonymous',
         }),
         opacity: 0.6,
-        zIndex: 20,
+        zIndex: 15,
         className: 'pressure-layer',
       });
     }

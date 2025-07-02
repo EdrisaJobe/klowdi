@@ -16,6 +16,12 @@ export function CloudLayer({ map, visible }: CloudLayerProps) {
   useEffect(() => {
     if (!map) return;
 
+    // Don't create the layer if API key is not available
+    if (!API_KEY) {
+      console.warn('OpenWeather API key not found. Cloud layer disabled.');
+      return;
+    }
+
     if (!layerRef.current) {
       layerRef.current = new TileLayer({
         source: new XYZ({
@@ -23,7 +29,7 @@ export function CloudLayer({ map, visible }: CloudLayerProps) {
           crossOrigin: 'anonymous',
         }),
         opacity: 0.6,
-        zIndex: 17,
+        zIndex: 15,
         className: 'cloud-layer',
       });
     }
@@ -35,7 +41,7 @@ export function CloudLayer({ map, visible }: CloudLayerProps) {
     }
 
     return () => {
-      if (layerRef.current && map) {
+      if (layerRef.current) {
         map.removeLayer(layerRef.current);
       }
     };

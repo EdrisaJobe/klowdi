@@ -16,6 +16,12 @@ export function PrecipitationLayer({ map, visible }: PrecipitationLayerProps) {
   useEffect(() => {
     if (!map) return;
 
+    // Don't create the layer if API key is not available
+    if (!API_KEY) {
+      console.warn('OpenWeather API key not found. Precipitation layer disabled.');
+      return;
+    }
+
     if (!layerRef.current) {
       layerRef.current = new TileLayer({
         source: new XYZ({

@@ -4,6 +4,10 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
+# Accept API key as build argument
+ARG VITE_OPENWEATHER_API_KEY
+ENV VITE_OPENWEATHER_API_KEY=$VITE_OPENWEATHER_API_KEY
+
 # Copy package files
 COPY package*.json ./
 
@@ -13,7 +17,7 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the React app
+# Build the React app (API key will be embedded here)
 RUN npm run build
 
 # Production stage

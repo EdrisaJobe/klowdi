@@ -16,20 +16,24 @@ export function RadarLayer({ map, visible }: RadarLayerProps) {
   useEffect(() => {
     if (!map) return;
 
-    // Create radar layer if it doesn't exist
+    // Don't create the layer if API key is not available
+    if (!RADAR_API_KEY) {
+      console.warn('OpenWeather API key not found. Radar layer disabled.');
+      return;
+    }
+
     if (!layerRef.current) {
       layerRef.current = new TileLayer({
         source: new XYZ({
           url: `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${RADAR_API_KEY}`,
           crossOrigin: 'anonymous',
         }),
-        opacity: 0.6,
-        zIndex: 25,
+        opacity: 0.7,
+        zIndex: 20,
         className: 'radar-layer',
       });
     }
 
-    // Add/remove layer based on visibility
     if (visible) {
       map.addLayer(layerRef.current);
     } else if (layerRef.current) {
