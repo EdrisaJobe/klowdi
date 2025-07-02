@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { getElevationData } from '../utils/elevation';
+import { getElevationData } from '../../utils/elevation';
 import { Mountain, Eye, Layers } from 'lucide-react';
 
 interface TopologyViewProps {

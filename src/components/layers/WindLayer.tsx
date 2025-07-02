@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
-import { drawWindArrows } from '../utils/canvas';
+import { drawWindArrows } from '../../utils/canvas';
 
 interface WindLayerProps {
   map: Map | null;

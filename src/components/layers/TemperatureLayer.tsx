@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
-import { getTemperatureData } from '../utils/weather';
-import { drawTemperatureHeatmap } from '../utils/canvas';
+import { getTemperatureData } from '../../utils/weather';
+import { drawTemperatureHeatmap } from '../../utils/canvas';
 
 interface TemperatureLayerProps {
   map: Map | null;

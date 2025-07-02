@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
-import { searchLocations } from '../utils/api';
-import type { LocationSuggestion } from '../types/location';
+import { searchLocations } from '../../utils/api';
+import type { LocationSuggestion } from '../../types/location';
 
 interface SearchBoxProps {
   onLocationSelect: (lat: number, lon: number) => void;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { SearchBox } from './components/SearchBox';
+import { SearchBox } from './components/ui/SearchBox';
 import { MapComponent } from './components/Map';
-import { WeatherInfo } from './components/WeatherInfo';
-import { LoadingOverlay } from './components/LoadingOverlay';
+import { WeatherInfo } from './components/ui/WeatherInfo';
+import { LoadingOverlay } from './components/ui/LoadingOverlay';
 import type { WeatherData } from './types/weather';
 import { getWeatherData } from './utils/api'; 
 import { getUserLocation } from './utils/location';

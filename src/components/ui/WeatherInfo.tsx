@@ -15,8 +15,8 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import type { WeatherData } from '../types/weather';
-import { getTemperatureColor } from '../utils/colors';
+import type { WeatherData } from '../../types/weather';
+import { getTemperatureColor } from '../../utils/colors';
 
 function celsiusToFahrenheit(celsius: number): number {
   return (celsius * 9/5) + 32;
@@ -78,25 +78,25 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
                 className="text-4xl sm:text-5xl font-bold"
                 style={{ color: getTemperatureColor(weather.main.temp, 1) }}
               >
-                {Math.round(weather.main.temp)}°C
+                {Math.round(celsiusToFahrenheit(weather.main.temp))}°F
               </span>
               <span className="text-gray-500 ml-2 text-lg">
-                {Math.round(celsiusToFahrenheit(weather.main.temp))}°F
+                {Math.round(weather.main.temp)}°C
               </span>
             </div>
             <div className="text-right">
               <div className="flex items-center gap-1 text-sm text-gray-600">
                 <ArrowUp className="w-4 h-4" />
-                <span className="font-medium">{Math.round(weather.main.temp_max)}°</span>
+                <span className="font-medium">{Math.round(celsiusToFahrenheit(weather.main.temp_max))}°F</span>
               </div>
               <div className="flex items-center gap-1 text-sm text-gray-600">
                 <ArrowUp className="w-4 h-4 rotate-180" />
-                <span className="font-medium">{Math.round(weather.main.temp_min)}°</span>
+                <span className="font-medium">{Math.round(celsiusToFahrenheit(weather.main.temp_min))}°F</span>
               </div>
             </div>
           </div>
           <div className="mt-2 text-sm text-gray-500 font-medium">
-            Feels like {Math.round(weather.main.feels_like)}°C
+            Feels like {Math.round(celsiusToFahrenheit(weather.main.feels_like))}°F ({Math.round(weather.main.feels_like)}°C)
           </div>
         </div>
 
