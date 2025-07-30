@@ -7,7 +7,7 @@ interface ElevationData extends Array<number> {
 
 ///////////////////// THIS IS PRIMARILY FOR CORS BYPASS IN DEVELOPMENT /////////////////////
 function createFallbackElevationData(lat: number, lon: number): ElevationData {
-  // Create realistic elevation data based on latitude
+  // Create realistic elevation data based on latitude and longitude (deterministic)
   const baseElevation = Math.abs(lat) * 10; // Higher elevations towards poles
   const coastalEffect = Math.sin(lon * Math.PI / 180) * 50; // Coastal variations
   
@@ -15,8 +15,10 @@ function createFallbackElevationData(lat: number, lon: number): ElevationData {
   const fallbackData = Array.from({ length: points }, (_, i) => {
     const angle = (i / points) * Math.PI * 2;
     const terrainVariation = Math.sin(angle * 3) * 30; // Natural terrain variations
-    const noiseVariation = (Math.random() - 0.5) * 10; // Random noise
-    return Math.max(0, baseElevation + coastalEffect + terrainVariation + noiseVariation);
+    // Use deterministic "noise" based on position instead of Math.random()
+    const positionSeed = lat * 1000 + lon * 1000 + i;
+    const deterministicNoise = Math.sin(positionSeed) * 10; // Deterministic variation
+    return Math.max(0, baseElevation + coastalEffect + terrainVariation + deterministicNoise);
   }) as ElevationData;
   
   fallbackData.min = Math.min(...fallbackData);
@@ -26,9 +28,15 @@ function createFallbackElevationData(lat: number, lon: number): ElevationData {
 }
 
 export async function getElevationData(lat: number, lon: number): Promise<ElevationData | null> {
-  // Return fallback data immediately for development to avoid CORS issues
-  console.log('Using fallback elevation data for development');
-  return createFallbackElevationData(lat, lon);
+  try {
+    // Try to use real elevation data first
+    console.log('Fetching real elevation data from Open Elevation API');
+    return await getElevationDataFromAPI(lat, lon);
+  } catch (error) {
+    // Only fall back to mock data if real API fails
+    console.warn('Failed to fetch real elevation data, using fallback:', error);
+    return createFallbackElevationData(lat, lon);
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 

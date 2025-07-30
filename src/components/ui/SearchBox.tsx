@@ -55,11 +55,8 @@ export function SearchBox({ onLocationSelect }: SearchBoxProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredSuggestions = suggestions.filter(suggestion => 
-    suggestion.name.toLowerCase().includes(query.toLowerCase()) ||
-    (suggestion.state?.toLowerCase().includes(query.toLowerCase())) ||
-    suggestion.country.toLowerCase().includes(query.toLowerCase())
-  );
+  // No need to filter suggestions again - the API already returns relevant results
+  const filteredSuggestions = suggestions;
 
   const handleLocationSelect = (location: LocationSuggestion) => {
     setQuery(`${location.name}${location.state ? `, ${location.state}` : ''}, ${location.country}`);
