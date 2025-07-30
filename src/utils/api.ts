@@ -63,6 +63,7 @@ async function searchLocationsByAPI(query: string): Promise<LocationSuggestion[]
   }));
 }
 
+// Mock data for fallback
 function generateMockWeatherData(lat: number, lon: number): WeatherData {
   const temp = Math.floor(Math.random() * 30) + 10;
   const feelsLike = temp + Math.floor(Math.random() * 5) - 2;
