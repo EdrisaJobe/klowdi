@@ -12,6 +12,33 @@ interface GeocodingResponse {
   local_names?: { en?: string };
 }
 
+interface WeatherAPIResponse {
+  coord: { lat: number; lon: number };
+  weather: Array<{
+    id: number;
+    main: string;
+    description: string;
+    icon: string;
+  }>;
+  main: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    humidity: number;
+    pressure: number;
+  };
+  wind?: {
+    speed: number;
+    deg: number;
+  };
+  sys: {
+    sunrise: number;
+    sunset: number;
+  };
+  name: string;
+}
+
 async function searchLocationsByAPI(query: string): Promise<LocationSuggestion[]> {
   if (!API_KEY) {
     throw new Error('OpenWeather API key not configured');
@@ -101,9 +128,56 @@ export async function searchLocations(
 }
 
 export async function getWeatherData(lat: number, lon: number): Promise<WeatherData> {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  const weatherData = generateMockWeatherData(lat, lon);
-  
-  return weatherData;
+  if (!API_KEY) {
+    console.warn('OpenWeather API key not configured, using mock data');
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return generateMockWeatherData(lat, lon);
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Weather API request failed: ${response.status} ${response.statusText}`);
+    }
+
+    const data: WeatherAPIResponse = await response.json();
+    
+    // Return the actual weather data from the API
+    return {
+      coord: { lat: data.coord.lat, lon: data.coord.lon },
+      weather: data.weather.map((w) => ({
+        id: w.id,
+        main: w.main,
+        description: w.description,
+        icon: w.icon
+      })),
+      main: {
+        temp: Math.round(data.main.temp * 10) / 10, // Round to 1 decimal place
+        feels_like: Math.round(data.main.feels_like * 10) / 10,
+        temp_min: Math.round(data.main.temp_min * 10) / 10,
+        temp_max: Math.round(data.main.temp_max * 10) / 10,
+        humidity: data.main.humidity,
+        pressure: data.main.pressure,
+      },
+      wind: {
+        speed: data.wind?.speed || 0,
+        deg: data.wind?.deg || 0
+      },
+      sys: {
+        sunrise: data.sys.sunrise,
+        sunset: data.sys.sunset
+      },
+      name: data.name || 'Current Location'
+    };
+  } catch (error) {
+    console.error('Error fetching real weather data:', error);
+    console.warn('Falling back to mock data');
+    
+    // Fallback to mock data if real API fails
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return generateMockWeatherData(lat, lon);
+  }
 }
