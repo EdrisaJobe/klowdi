@@ -32,6 +32,14 @@ interface WeatherAPIResponse {
     speed: number;
     deg: number;
   };
+  clouds?: {
+    all: number;
+  };
+  rain?: {
+    '1h'?: number;
+    '3h'?: number;
+  };
+  visibility?: number;
   sys: {
     sunrise: number;
     sunset: number;
@@ -99,6 +107,13 @@ function generateMockWeatherData(lat: number, lon: number): WeatherData {
       speed: windSpeed,
       deg: Math.floor(Math.random() * 360)
     },
+    clouds: {
+      all: Math.floor(Math.random() * 100) // 0-100% cloud coverage
+    },
+    rain: Math.random() > 0.7 ? { // 30% chance of rain
+      '1h': Math.round(Math.random() * 5 * 10) / 10 // 0-5mm rain
+    } : undefined,
+    visibility: Math.floor(Math.random() * 8000) + 2000, // 2-10km visibility
     sys: {
       sunrise: Math.floor(Date.now() / 1000) - 21600,
       sunset: Math.floor(Date.now() / 1000) + 21600
@@ -167,6 +182,9 @@ export async function getWeatherData(lat: number, lon: number): Promise<WeatherD
         speed: data.wind?.speed || 0,
         deg: data.wind?.deg || 0
       },
+      clouds: data.clouds ? { all: data.clouds.all } : undefined,
+      rain: data.rain ? { '1h': data.rain['1h'] } : undefined,
+      visibility: data.visibility,
       sys: {
         sunrise: data.sys.sunrise,
         sunset: data.sys.sunset

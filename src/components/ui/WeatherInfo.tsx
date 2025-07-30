@@ -105,7 +105,7 @@ export function WeatherInfo({ weather }: WeatherInfoProps) {
             <WeatherCard icon={<Droplets className="w-6 h-6 text-blue-500 animate-pulse" />} value={`${weather.main.humidity}%`} label="Humidity" />
             <WeatherCard icon={<Gauge className="w-6 h-6 text-emerald-500" />} value={`${weather.main.pressure} hPa`} label="Surface Pressure" />
             <WeatherCard icon={<SunDim className="w-6 h-6 text-yellow-500" />} value={`${weather.clouds?.all || 0}%`} label="Cloud Coverage" />
-            <WeatherCard icon={<CloudRain className="w-6 h-6 text-blue-400" />} value={`${Math.round((weather.rain?.['1h'] || 0) * 100)}%`} label="Precipitation" />
+            <WeatherCard icon={<CloudRain className="w-6 h-6 text-blue-400" />} value={`${(weather.rain?.['1h'] || 0).toFixed(1)} mm`} label="Precipitation" />
           </div>
           
           <div className="space-y-3">
