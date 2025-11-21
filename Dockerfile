@@ -4,9 +4,11 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Accept API key as build argument
+# Accept API keys as build arguments
 ARG VITE_OPENWEATHER_API_KEY
 ENV VITE_OPENWEATHER_API_KEY=$VITE_OPENWEATHER_API_KEY
+ARG RAPIDAPI_KEY
+ENV RAPIDAPI_KEY=$RAPIDAPI_KEY
 
 # Copy package files
 COPY package*.json ./
@@ -35,8 +37,9 @@ RUN npm ci --only=production
 # Copy built app from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Copy server file
-COPY server.js ./
+# Copy server file and server utilities
+COPY --from=builder /app/server.js ./
+COPY --from=builder /app/server-utils ./server-utils
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \

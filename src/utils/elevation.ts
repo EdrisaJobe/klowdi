@@ -29,8 +29,6 @@ function createFallbackElevationData(lat: number, lon: number): ElevationData {
 
 export async function getElevationData(lat: number, lon: number): Promise<ElevationData | null> {
   try {
-    // Try to use real elevation data first
-    console.log('Fetching real elevation data from Open Elevation API');
     return await getElevationDataFromAPI(lat, lon);
   } catch (error) {
     // Only fall back to mock data if real API fails
@@ -40,47 +38,52 @@ export async function getElevationData(lat: number, lon: number): Promise<Elevat
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Original API implementation
-// I can enable this in production with proper CORS configuration
-const ELEVATION_API_URL = 'https://api.open-elevation.com/api/v1/lookup';
+// Use server proxy to avoid CORS issues
+const ELEVATION_API_URL = '/api/elevation';
 
 interface ElevationResponse {
-  results: Array<{
-    latitude: number;
-    longitude: number;
-    elevation: number;
-  }>;
+  elevations: number[];
+  min: number;
+  max: number;
+  fallback?: boolean;
 }
+
+// Cache for elevation data to reduce API calls
+const elevationCache = new Map<string, { data: ElevationData; timestamp: number }>();
+const CACHE_DURATION = 3600000; // 1 hour
 
 export async function getElevationDataFromAPI(lat: number, lon: number): Promise<ElevationData | null> {
   try {
-    const radius = 0.05;
-    const points = 36;
-    const locations = [];
+    // Round coordinates to reduce unique requests
+    const roundedLat = Math.round(lat * 100) / 100;
+    const roundedLon = Math.round(lon * 100) / 100;
+    const cacheKey = `${roundedLat},${roundedLon}`;
     
-    for (let i = 0; i < points; i++) {
-      const angle = (i / points) * Math.PI * 2;
-      const pointLat = lat + Math.sin(angle) * radius;
-      const pointLon = lon + Math.cos(angle) * radius;
-      locations.push({ latitude: pointLat, longitude: pointLon });
+    // Check cache first
+    const cached = elevationCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
     }
     
     const response = await fetch(ELEVATION_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ locations })
+      body: JSON.stringify({ lat: roundedLat, lon: roundedLon })
     });
     
     if (!response.ok) throw new Error('Failed to fetch elevation data');
 
     const data: ElevationResponse = await response.json();
-    const elevations = data.results.map(result => 
-      result.elevation === null ? 0 : result.elevation
-    );
     
-    const result = elevations as ElevationData;
-    result.min = Math.min(...elevations);
-    result.max = Math.max(...elevations);
+    const result = data.elevations as ElevationData;
+    result.min = data.min;
+    result.max = data.max;
+    
+    // Cache the result
+    elevationCache.set(cacheKey, {
+      data: result,
+      timestamp: Date.now()
+    });
     
     return result;
   } catch (error) {

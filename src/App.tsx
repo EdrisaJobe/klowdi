@@ -3,6 +3,7 @@ import { SearchBox } from './components/ui/SearchBox';
 import { MapComponent } from './components/Map';
 import { WeatherInfo } from './components/ui/WeatherInfo';
 import { LoadingOverlay } from './components/ui/LoadingOverlay';
+import { AIAgentWidget } from './components/ui/AIAgentWidget';
 import type { WeatherData } from './types/weather';
 import { getWeatherData } from './utils/api'; 
 import { getUserLocation } from './utils/location';
@@ -12,6 +13,7 @@ function App() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [center, setCenter] = useState<[number, number] | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lon: number; name?: string } | null>(null);
 
   useEffect(() => {
     async function initializeLocation() {
@@ -38,6 +40,11 @@ function App() {
       setCenter([lon, lat]);
       const data = await getWeatherData(lat, lon);
       setWeatherData(data);
+      setCurrentLocation({
+        lat,
+        lon,
+        name: data.name
+      });
     } catch (error) {
       console.error('Error fetching weather data:', error);
     }
@@ -54,6 +61,7 @@ function App() {
       />
       {weatherData && <WeatherInfo weather={weatherData} />}
       {isLoading && <LoadingOverlay />}
+      <AIAgentWidget currentWeather={weatherData} currentLocation={currentLocation} />
     </div>
   );
 }
