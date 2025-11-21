@@ -128,57 +128,33 @@ app.get('/api/test-chat', async (req, res) => {
     
     console.log('Testing RapidAPI connection...')
     
-    // Try gpt4 endpoint first
+    // Test chatgpt-ai-chat-bot endpoint
     try {
       const response = await axios.request({
         method: 'POST',
-        url: 'https://chatgpt-42.p.rapidapi.com/gpt4',
+        url: 'https://chatgpt-ai-chat-bot.p.rapidapi.com/ask',
         headers: {
           'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-          'x-rapidapi-host': 'chatgpt-42.p.rapidapi.com',
+          'x-rapidapi-host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
           'Content-Type': 'application/json'
         },
         data: {
-          messages: [
-            {
-              role: 'user',
-              content: 'Say hello in one word.'
-            }
-          ],
-          web_access: false
+          query: 'Say hello in one word.'
         },
         timeout: 10000
       })
       
-      console.log('GPT-4 endpoint working')
-      return res.json({ success: true, endpoint: 'gpt4', response: response.data })
-    } catch (gpt4Error) {
-      console.log('WARNING: GPT-4 endpoint failed, trying conversationgpt...')
+      // Check if the response contains an error message
+      if (response.data && response.data.error) {
+        throw new Error(`API error: ${JSON.stringify(response.data.error)}`)
+      }
       
-      // Fallback to conversationgpt
-      const response = await axios.request({
-        method: 'POST',
-        url: 'https://chatgpt-42.p.rapidapi.com/conversationgpt',
-        headers: {
-          'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-          'x-rapidapi-host': 'chatgpt-42.p.rapidapi.com',
-          'Content-Type': 'application/json'
-        },
-        data: {
-          messages: [
-            {
-              role: 'user',
-              content: 'Say hello in one word.'
-            }
-          ],
-          system_prompt: 'You are a helpful assistant.',
-          web_access: false
-        },
-        timeout: 10000
-      })
-      
-      console.log('conversationgpt endpoint working')
-      return res.json({ success: true, endpoint: 'conversationgpt', response: response.data })
+      console.log('ChatGPT AI Chat Bot endpoint working')
+      return res.json({ success: true, endpoint: 'chatgpt-ai-chat-bot', response: response.data })
+    } catch (apiError) {
+      console.log('ERROR: ChatGPT API test failed')
+      console.log('Error:', apiError.message)
+      throw apiError
     }
   } catch (error) {
     console.error('RapidAPI test error:', error)
@@ -262,57 +238,29 @@ app.post('/api/chat', async (req, res) => {
     
     let response
     try {
-      // Try the gpt-4o-mini endpoint first (more reliable)
+      // Use chatgpt-ai-chat-bot API
       response = await axios.request({
         method: 'POST',
-        url: 'https://chatgpt-42.p.rapidapi.com/gpt4',
+        url: 'https://chatgpt-ai-chat-bot.p.rapidapi.com/ask',
         headers: {
           'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-          'x-rapidapi-host': 'chatgpt-42.p.rapidapi.com',
+          'x-rapidapi-host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
           'Content-Type': 'application/json'
         },
         data: {
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful weather assistant. Provide concise, accurate responses.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          web_access: false
+          query: prompt
         },
         timeout: 30000 // 30 second timeout
       })
-    } catch (gpt4Error) {
-      console.log('WARNING: GPT-4 endpoint failed, trying conversationgpt endpoint...')
-      // Fallback to conversationgpt endpoint
-      response = await axios.request({
-        method: 'POST',
-        url: 'https://chatgpt-42.p.rapidapi.com/conversationgpt',
-        headers: {
-          'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-          'x-rapidapi-host': 'chatgpt-42.p.rapidapi.com',
-          'Content-Type': 'application/json'
-        },
-        data: {
-          messages: [
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          system_prompt: 'You are a helpful weather assistant.',
-          temperature: 0.7,
-          top_k: 40,
-          top_p: 0.9,
-          max_tokens: 500,
-          web_access: false
-        },
-        timeout: 30000
-      })
+      
+      // Check if the response contains an error message
+      if (response.data && response.data.error) {
+        throw new Error(`API error: ${JSON.stringify(response.data.error)}`)
+      }
+    } catch (apiError) {
+      console.log('WARNING: ChatGPT API endpoint failed')
+      console.log('Error:', apiError.message)
+      throw apiError
     }
 
     console.log('RapidAPI response status:', response.status)
@@ -327,6 +275,9 @@ app.post('/api/chat', async (req, res) => {
     let responseText = ''
     if (typeof response.data === 'string') {
       responseText = response.data
+    } else if (response.data?.choices && Array.isArray(response.data.choices) && response.data.choices.length > 0) {
+      // OpenAI-compatible format
+      responseText = response.data.choices[0]?.message?.content || response.data.choices[0]?.text || ''
     } else if (response.data?.result !== undefined && response.data?.result !== null) {
       // Handle result - could be string, object, number, or array
       const result = response.data.result

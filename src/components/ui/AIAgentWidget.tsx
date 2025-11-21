@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Info } from 'lucide-react';
 import type { ChatMessage } from '../../utils/aiAgent';
 import type { WeatherData } from '../../types/weather';
 
@@ -10,6 +10,7 @@ interface AIAgentWidgetProps {
 
 export function AIAgentWidget({ currentWeather, currentLocation }: AIAgentWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
@@ -165,6 +166,25 @@ export function AIAgentWidget({ currentWeather, currentLocation }: AIAgentWidget
             <div className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-blue-500" />
               <h3 className="font-semibold text-gray-800">Weather Assistant</h3>
+              <div className="relative">
+                <button
+                  onMouseEnter={() => setShowTooltip(true)}
+                  onMouseLeave={() => setShowTooltip(false)}
+                  onClick={() => setShowTooltip(!showTooltip)}
+                  className="p-0.5 rounded-full hover:bg-gray-100/80 transition-colors"
+                  aria-label="Information"
+                >
+                  <Info className="w-4 h-4 text-gray-500" />
+                </button>
+                {showTooltip && (
+                  <div className="absolute left-0 top-8 z-50 w-64 bg-gray-900 text-white text-xs rounded-lg p-3 shadow-xl">
+                    <div className="relative">
+                      <div className="absolute -top-5 left-2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900"></div>
+                      <p>This AI chat bot cannot access the internet, but it has the latest up-to-date content and knowledge to assist you.</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
