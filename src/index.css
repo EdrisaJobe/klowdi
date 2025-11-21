@@ -16,28 +16,104 @@ body {
 
 .ol-control {
   background: none;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+.ol-attribution {
+  position: absolute !important;
+  bottom: 4px !important;
+  right: 4px !important;
+  top: auto !important;
+  left: auto !important;
+  text-align: right;
+  max-width: calc(100% - 8px);
+  z-index: 5 !important;
+}
+
+.ol-attribution ul {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px);
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  font-size: 10px !important;
+  color: #666 !important;
+  margin: 0 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ol-attribution button {
+  display: none !important;
+}
+
+.ol-attribution a {
+  color: #666 !important;
+  text-decoration: none !important;
+}
+
+.ol-attribution a:hover {
+  color: #333 !important;
+  text-decoration: underline !important;
+}
+
+@media (max-width: 640px) {
+  .ol-attribution {
+    bottom: 2px !important;
+    right: 2px !important;
+  }
+  
+  .ol-attribution ul {
+    font-size: 9px !important;
+    padding: 3px 6px !important;
+  }
 }
 
 .ol-zoom {
   right: 0.5em;
   left: auto;
   top: 5em;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 100 !important;
+  position: absolute !important;
+  pointer-events: auto !important;
 }
 
 .ol-zoom button {
   background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(8px);
   color: #333 !important;
-  margin: 1px;
+  margin: 0 !important;
   transition: all 0.2s;
   font-weight: bold !important;
-  font-size: 1em !important;
-  padding: 0.3em !important;
+  font-size: 1.2em !important;
+  padding: 0.5em !important;
   touch-action: manipulation;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 101 !important;
 }
 
 .ol-zoom button:hover {
   background-color: rgba(255, 255, 255, 1) !important;
   color: #000 !important;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.ol-zoom button:active {
+  transform: scale(0.95);
 }
 
 @keyframes moveWind {
@@ -103,11 +179,12 @@ body {
 @media (min-width: 640px) {
   .ol-zoom {
     top: 1em;
+    right: 1em;
   }
   
   .ol-zoom button {
-    margin: 2px;
-    font-size: 1.2em !important;
-    padding: 0.5em !important;
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 1.4em !important;
   }
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { defaults as defaultInteractions } from 'ol/interaction';
+import { defaults as defaultControls } from 'ol/control';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
@@ -84,6 +85,11 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         markerLayer,
       ],
       overlays: [overlayRef.current],
+      controls: defaultControls({
+        zoom: true,
+        rotate: false,
+        attribution: true
+      }),
       view: new View({
         center: fromLonLat(center),
         zoom: 4,
@@ -271,7 +277,8 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
       />
       
       {/* Copyright Footer */}
-      <footer className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center text-sm font-semibold text-gray-800 z-10">
+      <footer className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-center text-xs sm:text-sm font-semibold text-gray-800 z-10 
+                       bg-white/80 backdrop-blur-sm px-4 py-1.5 rounded-lg shadow-sm">
        © {new Date().getFullYear()} Klowdi. All rights reserved. Made by Edrisa Jobe.
       </footer>
     </>

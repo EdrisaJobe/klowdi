@@ -34,8 +34,8 @@ export function LayerControl({
   onToggleClouds,
 }: LayerControlProps) {
   return (
-    <div className="fixed sm:absolute top-16 sm:top-32 sm:right-2 z-10 w-full sm:w-auto">
-      <div className="flex sm:flex-col gap-2 p-3 mx-2 sm:mx-0 bg-white/80 backdrop-blur-md rounded-xl shadow-xl border border-gray-100/50">
+    <div className="fixed sm:absolute top-16 sm:top-32 sm:right-2 z-[5] w-full sm:w-auto pointer-events-none">
+      <div className="flex sm:flex-col gap-2 p-3 mx-2 sm:mx-0 bg-white/80 backdrop-blur-md rounded-xl shadow-xl border border-gray-100/50 pointer-events-auto">
         <button
           onClick={onToggleSatellite}
           className={`flex-1 sm:w-full flex items-center justify-center sm:justify-start gap-2 p-2 sm:px-3 sm:py-2 rounded-lg
