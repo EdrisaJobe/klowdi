@@ -109,9 +109,9 @@ export function GlobeView({ center, show }: GlobeViewProps) {
 
   return (
     <div 
-      className={`fixed left-4 top-20 sm:top-16 z-10 transition-all duration-300 transform ${
-        show ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-      } bg-black rounded-lg shadow-lg border border-gray-800 overflow-hidden`}
+      className={`fixed left-4 top-20 sm:top-16 z-30 transition-all duration-300 transform ${
+        show ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
+      } bg-black rounded-lg shadow-2xl border border-gray-800 overflow-hidden`}
     >
       <div ref={containerRef} className="w-[300px] h-[300px]" />
     </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { defaults as defaultInteractions } from 'ol/interaction';
-import { defaults as defaultControls } from 'ol/control';
+import { Attribution } from 'ol/control';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
@@ -12,7 +12,7 @@ import { fromLonLat } from 'ol/proj';
 import { Overlay } from 'ol';
 import 'ol/ol.css';
 import { getUserLocation } from '../utils/location';
-import { Globe, MapPin, Loader2 } from 'lucide-react';
+import { Globe, MapPin, Loader2, Plus, Minus } from 'lucide-react';
 import { createLocationMarker } from '../utils/map';
 import { LayerControl } from './ui/LayerControl';
 import { WindLayer } from './layers/WindLayer';
@@ -85,11 +85,7 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         markerLayer,
       ],
       overlays: [overlayRef.current],
-      controls: defaultControls({
-        zoom: true,
-        rotate: false,
-        attribution: true
-      }),
+      controls: [new Attribution({ collapsible: false })],
       view: new View({
         center: fromLonLat(center),
         zoom: 4,
@@ -164,6 +160,32 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
     setIsLoadingLayers(true);
     setter(!current);
     setTimeout(() => setIsLoadingLayers(false), 1000);
+  };
+
+  const handleZoomIn = () => {
+    if (mapInstanceRef.current) {
+      const view = mapInstanceRef.current.getView();
+      const currentZoom = view.getZoom();
+      if (currentZoom !== undefined) {
+        view.animate({
+          zoom: currentZoom + 1,
+          duration: 250
+        });
+      }
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (mapInstanceRef.current) {
+      const view = mapInstanceRef.current.getView();
+      const currentZoom = view.getZoom();
+      if (currentZoom !== undefined) {
+        view.animate({
+          zoom: currentZoom - 1,
+          duration: 250
+        });
+      }
+    }
   };
 
   return (
@@ -275,6 +297,34 @@ export function MapComponent({ center = [0, 0], ready = false, weatherData, onLo
         center={center}
         show={showGlobe}
       />
+      
+      {/* Custom Zoom Controls */}
+      <div className="fixed bottom-32 right-4 sm:top-4 sm:bottom-auto sm:right-4 z-[200] flex flex-col gap-2">
+        <button
+          onClick={handleZoomIn}
+          className="bg-white/95 backdrop-blur-md hover:bg-white text-gray-700 hover:text-gray-900
+                   w-9 h-9 sm:w-10 sm:h-10 rounded-lg shadow-lg hover:shadow-xl
+                   border border-gray-200 hover:border-gray-300
+                   flex items-center justify-center
+                   transition-all duration-200 hover:scale-105 active:scale-95"
+          aria-label="Zoom in"
+          title="Zoom in"
+        >
+          <Plus className="w-5 h-5" strokeWidth={2.5} />
+        </button>
+        <button
+          onClick={handleZoomOut}
+          className="bg-white/95 backdrop-blur-md hover:bg-white text-gray-700 hover:text-gray-900
+                   w-9 h-9 sm:w-10 sm:h-10 rounded-lg shadow-lg hover:shadow-xl
+                   border border-gray-200 hover:border-gray-300
+                   flex items-center justify-center
+                   transition-all duration-200 hover:scale-105 active:scale-95"
+          aria-label="Zoom out"
+          title="Zoom out"
+        >
+          <Minus className="w-5 h-5" strokeWidth={2.5} />
+        </button>
+      </div>
       
       {/* Copyright Footer */}
       <footer className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-center text-xs sm:text-sm font-semibold text-gray-800 z-10 
