@@ -14,7 +14,7 @@ export function AIAgentWidget({ currentWeather, currentLocation }: AIAgentWidget
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: "Hi! I'm your weather assistant. I can help you with weather information for any location. Ask me things like 'What's the weather like in Miami?' or 'Tell me about the current location.'"
+      content: "Hi! I'm your weather assistant. I can help you with weather information for any location. Ask me things like 'What's the distance from Houston, TX to Albany, NY?' or 'Tell me about the current location.'"
     }
   ]);
   const [input, setInput] = useState('');
