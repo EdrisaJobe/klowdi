@@ -146,7 +146,7 @@ export function AIAgentWidget({ currentWeather, currentLocation }: AIAgentWidget
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed top-32 right-4 sm:top-4 sm:left-[calc(50%+240px)] sm:right-auto z-40 bg-blue-500 hover:bg-blue-600 text-white 
+          className="fixed top-36 right-4 sm:top-4 sm:left-[calc(50%+240px)] sm:right-auto z-40 bg-blue-500 hover:bg-blue-600 text-white 
                    rounded-full p-3 sm:p-4 shadow-xl hover:shadow-2xl transition-all duration-300 
                    hover:scale-110 flex items-center justify-center"
           aria-label="Open AI Assistant"
@@ -157,7 +157,7 @@ export function AIAgentWidget({ currentWeather, currentLocation }: AIAgentWidget
 
       {/* Chat Panel */}
       {isOpen && (
-        <div className="fixed top-32 right-4 sm:top-4 sm:left-[calc(50%+240px)] sm:right-auto z-40 w-[calc(100vw-2rem)] sm:w-96 h-[600px] 
+        <div className="fixed top-36 right-4 sm:top-4 sm:left-[calc(50%+240px)] sm:right-auto z-40 w-[calc(100vw-2rem)] sm:w-96 sm:max-w-[calc(100vw-7rem)] h-[600px] 
                       bg-white/90 backdrop-blur-md rounded-xl shadow-2xl border border-gray-100/50 
                       flex flex-col animate-slideUp"
         >

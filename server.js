@@ -128,18 +128,27 @@ app.get('/api/test-chat', async (req, res) => {
     
     console.log('Testing RapidAPI connection...')
     
-    // Test chatgpt-ai-chat-bot endpoint
+    // Test chatgpt-42 chatbotapi endpoint
     try {
       const response = await axios.request({
         method: 'POST',
-        url: 'https://chatgpt-ai-chat-bot.p.rapidapi.com/ask',
+        url: 'https://chatgpt-42.p.rapidapi.com/chatbotapi',
         headers: {
           'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-          'x-rapidapi-host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
+          'x-rapidapi-host': 'chatgpt-42.p.rapidapi.com',
           'Content-Type': 'application/json'
         },
         data: {
-          query: 'Say hello in one word.'
+          bot_id: 'OEXJ8qFp5E5AwRwymfPts90vrHnmr8yZgNE171101852010w2S0bCtN3THp448W7kDSfyTf3OpW5TUVefz',
+          messages: [
+            { role: 'user', content: 'Say hello in one word.' }
+          ],
+          user_id: '',
+          temperature: 0.9,
+          top_k: 5,
+          top_p: 0.9,
+          max_tokens: 256,
+          model: 'gpt 3.5'
         },
         timeout: 10000
       })
@@ -149,8 +158,8 @@ app.get('/api/test-chat', async (req, res) => {
         throw new Error(`API error: ${JSON.stringify(response.data.error)}`)
       }
       
-      console.log('ChatGPT AI Chat Bot endpoint working')
-      return res.json({ success: true, endpoint: 'chatgpt-ai-chat-bot', response: response.data })
+      console.log('ChatGPT-42 chatbotapi endpoint working')
+      return res.json({ success: true, endpoint: 'chatgpt-42', response: response.data })
     } catch (apiError) {
       console.log('ERROR: ChatGPT API test failed')
       console.log('Error:', apiError.message)
@@ -187,68 +196,67 @@ app.post('/api/chat', async (req, res) => {
 
     console.log('RapidAPI key found, processing chat request...')
     
-    // Get the last user message (RapidAPI expects a single text input)
-    const lastMessage = messages && messages.length > 0 
-      ? messages[messages.length - 1] 
-      : { role: 'user', content: 'Hello' }
-    
-    // Build context-aware prompt
-    let prompt = lastMessage.content || ''
+    // Build system prompt with context
+    let systemPrompt = 'You are a helpful weather assistant. You can answer questions about weather for any location.'
     
     // Add context about current location and weather if available
     if (currentLocation && currentWeather) {
-      const locationInfo = `Current location: ${currentLocation.name || `${currentLocation.lat}, ${currentLocation.lon}`}. `
-      const weatherInfo = `Current weather: ${currentWeather.weather[0].description}, ${Math.round((currentWeather.main.temp * 9/5) + 32)}°F, humidity ${currentWeather.main.humidity}%, wind ${currentWeather.wind.speed} m/s. `
-      prompt = `Context: ${locationInfo}${weatherInfo}User question: ${prompt}`
+      const locationInfo = `Current location: ${currentLocation.name || `${currentLocation.lat}, ${currentLocation.lon}`}.`
+      const weatherInfo = `Current weather: ${currentWeather.weather[0].description}, ${Math.round((currentWeather.main.temp * 9/5) + 32)}°F, humidity ${currentWeather.main.humidity}%, wind ${currentWeather.wind.speed} m/s.`
+      systemPrompt += ` ${locationInfo} ${weatherInfo}`
     }
+
+    // Build the messages array for the new API
+    const conversationMessages = messages && messages.length > 0
+      ? messages.slice(-10).map(msg => ({ role: msg.role, content: msg.content }))
+      : [{ role: 'user', content: 'Hello' }]
+
+    // Get the last user message to check for weather location queries
+    const lastUserMessage = conversationMessages.filter(m => m.role === 'user').pop()
     
-    // Add conversation history context if available
-    if (messages && messages.length > 1) {
-      const conversationContext = messages
-        .slice(-5) // Last 5 messages for context
-        .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
-        .join('\n')
-      prompt = `Previous conversation:\n${conversationContext}\n\nCurrent question: ${prompt}`
-    }
-
-    // Add system instructions
-    prompt = `You are a helpful weather assistant. You can answer questions about weather for any location. ${prompt}`
-
     // Check if user is asking about weather for a specific location
-    const locationMatch = prompt.match(/(?:weather|temperature|forecast|climate).*?(?:in|at|for)\s+([A-Za-z\s,]+?)(?:[?.!]|$)/i)
-    if (locationMatch) {
-      const location = locationMatch[1].trim()
-      try {
-        const weatherResult = await getWeatherDataTool(location)
-        const weatherInfo = formatWeatherData(weatherResult)
-        prompt = `${prompt}\n\nHere is the current weather data:\n${weatherInfo}\n\nPlease provide a helpful response based on this data.`
-      } catch (error) {
-        console.log('Could not fetch weather for location:', location)
+    if (lastUserMessage) {
+      const locationMatch = lastUserMessage.content.match(/(?:weather|temperature|forecast|climate).*?(?:in|at|for)\s+([A-Za-z\s,]+?)(?:[?.!]|$)/i)
+      if (locationMatch) {
+        const location = locationMatch[1].trim()
+        try {
+          const weatherResult = await getWeatherDataTool(location)
+          const weatherInfo = formatWeatherData(weatherResult)
+          systemPrompt += `\n\nHere is the current weather data for ${location}:\n${weatherInfo}\n\nPlease provide a helpful response based on this data.`
+        } catch (error) {
+          console.log('Could not fetch weather for location:', location)
+        }
       }
     }
 
+    const apiMessages = [
+      { role: 'system', content: systemPrompt },
+      ...conversationMessages
+    ]
+
     console.log('Sending request to RapidAPI...')
-    console.log('Prompt length:', prompt.length)
-    
-    // Validate prompt length (many APIs have limits)
-    if (prompt.length > 2000) {
-      prompt = prompt.substring(0, 2000)
-      console.log('WARNING: Prompt truncated to 2000 characters')
-    }
+    console.log('Messages count:', apiMessages.length)
     
     let response
     try {
-      // Use chatgpt-ai-chat-bot API
+      // Use chatgpt-42 chatbotapi
       response = await axios.request({
         method: 'POST',
-        url: 'https://chatgpt-ai-chat-bot.p.rapidapi.com/ask',
+        url: 'https://chatgpt-42.p.rapidapi.com/chatbotapi',
         headers: {
           'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-          'x-rapidapi-host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
+          'x-rapidapi-host': 'chatgpt-42.p.rapidapi.com',
           'Content-Type': 'application/json'
         },
         data: {
-          query: prompt
+          bot_id: 'OEXJ8qFp5E5AwRwymfPts90vrHnmr8yZgNE171101852010w2S0bCtN3THp448W7kDSfyTf3OpW5TUVefz',
+          messages: apiMessages,
+          user_id: '',
+          temperature: 0.9,
+          top_k: 5,
+          top_p: 0.9,
+          max_tokens: 256,
+          model: 'gpt 3.5'
         },
         timeout: 30000 // 30 second timeout
       })
